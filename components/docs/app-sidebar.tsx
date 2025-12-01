@@ -1,6 +1,5 @@
 
 "use client"
-
 import * as React from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
@@ -36,11 +35,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
         <Sidebar {...props}>
             <SidebarHeader>
-                <div className="flex items-center gap-2 px-2 py-2">
-                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-black text-white dark:bg-white dark:text-black">
-                        <span className="text-lg font-bold">L</span>
-                    </div>
-                    <span className="font-semibold">LumenUI</span>
+                <div className="flex items-center gap-6 px-3 py-2">
+                    <Link className="flex items-center " href="/">
+                        <span className="hidden font-semibold text-lg sm:block">
+                            LumenUI
+                        </span>
+                    </Link>
                 </div>
             </SidebarHeader>
             <SidebarContent>

@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "motion/react";
-import Link from "next/link";
 import SlideTextButton from "@/components/lumenui/slide-text-button";
 import FeatureBlock from "@/components/landing/FeatureBlock";
 import CardFlip from "@/components/lumenui/card-flip";
@@ -13,43 +12,31 @@ import AILoadingState from "@/components/lumenui/ai-loading";
 
 export function HeroSection() {
   return (
-
     <div className="container relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col items-center justify-between gap-8 px-4 py-8 md:py-12 lg:flex-row lg:gap-4">
-
+      
       {/* Left side - Title and CTA */}
-      <div className="flex w-full flex-col items-start space-y-8 text-left md:mb-28 lg:w-[45%]">
+      <div className="flex w-full flex-col items-start space-y-8 text-left md:mb-42 lg:w-[45%]">
         <div>
-
-
           <h1 className="font-semibold font-montserrat text-5xl text-black leading-[1.1] tracking-tight sm:text-6xl lg:text-6xl dark:text-white">
-            Collection of stunning Components
+            Build faster with stunning UI components
           </h1>
 
           <p className="mt-6 max-w-lg font-montserrat text-base text-black/90 tracking-tighter md:text-xl dark:text-white/80">
-            50+ Beautiful, modern UI components built with Tailwind CSS,
-            shadcn/ui, and Motion to use on your Websites. Now available as
-            LumenUI - a lightweight, accessible component library.
+            A growing collection of 50+ modern UI components built using Tailwind CSS, 
+            shadcn/ui, and Motion refined into the lightweight, accessible LumenUI library.
           </p>
         </div>
-
         <div className="flex w-full flex-col justify-center sm:justify-start">
           <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:items-start sm:justify-start">
-            <SlideTextButton hoverText="Click to see more" href="/docs/components/action-search-bar" />
-            <SlideTextButton
-              hoverText="Click to see more"
-              href="/templates"
-              text="View Templates"
-              variant="ghost"
-            />
+          <SlideTextButton hoverText="Click to see more" href="/docs/components/action-search-bar" />
           </div>
         </div>
-
         <FeatureBlock />
         <div className="mt-8 w-full space-y-2"> </div>
       </div>
 
       {/* Right side - Dynamic Component Preview Grid */}
-      <div className="flex w-full flex-col justify-between gap-4 lg:w-[55%] lg:pl-8">
+      <div className="flex w-full flex-col justify-between gap-2 lg:w-[55%] lg:pl-8">
 
         {/* Top Row - Bento Grid Style */}
         <motion.div

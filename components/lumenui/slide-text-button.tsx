@@ -1,6 +1,4 @@
 "use client";
-
-
 import { motion } from "motion/react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -17,7 +15,7 @@ interface SlideTextButtonProps
 export default function SlideTextButton({
   text = "Browse Components",
   hoverText,
-  href = "/docs/components/liquid-glass-card",
+  href = "",
   className,
   variant = "default",
   ...props

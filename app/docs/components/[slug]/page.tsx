@@ -42,9 +42,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
                     <span>{componentName}</span>
                 </div>
                 <h1 className="text-3xl font-bold tracking-tight">{componentName}</h1>
-                <p className="text-muted-foreground text-lg mt-2">
-                    A reusable component built with Tailwind CSS and Motion.
-                </p>
+                
             </div>
             <div className="flex-1 overflow-auto px-6 py-6">
                 <ComponentPreview code={code}>
