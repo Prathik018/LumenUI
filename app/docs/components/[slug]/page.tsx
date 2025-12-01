@@ -1,5 +1,5 @@
 
-import { componentRegistry } from "@/lib/registry";
+
 import { componentsList } from "@/lib/components";
 import { notFound } from "next/navigation";
 import fs from "fs";
@@ -14,9 +14,19 @@ export function generateStaticParams() {
 
 export default async function ComponentPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const Component = componentRegistry[slug];
 
-    if (!Component) {
+    const componentData = componentsList.find(c => c.slug === slug);
+
+    if (!componentData) {
+        return notFound();
+    }
+
+    let Component;
+    try {
+        const mod = await import(`@/components/lumenui/${slug}`);
+        Component = mod.default;
+    } catch (error) {
+        console.error(`Component not found: ${slug}`, error);
         return notFound();
     }
 
@@ -29,7 +39,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
         code = "// Error reading file content";
     }
 
-    const componentData = componentsList.find(c => c.slug === slug);
+
     const componentName = componentData?.name || slug;
     const componentCategory = componentData?.category || "Component";
 
@@ -42,7 +52,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
                     <span>{componentName}</span>
                 </div>
                 <h1 className="text-3xl font-bold tracking-tight">{componentName}</h1>
-                
+
             </div>
             <div className="flex-1 overflow-auto px-6 py-6">
                 <ComponentPreview code={code}>

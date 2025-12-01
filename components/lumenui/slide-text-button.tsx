@@ -34,19 +34,29 @@ export default function SlideTextButton({
     >
       <Link
         className={cn(
-          "group relative inline-flex h-10 items-center justify-center overflow-hidden rounded-lg px-8 font-medium text-md tracking-tighter transition-all duration-300 md:min-w-56",
+          "group relative inline-flex h-10 items-center justify-center overflow-hidden rounded-xl px-1 font-medium text-md tracking-tighter transition-all duration-400 md:min-w-40",
           variantStyles,
           className
         )}
         href={href}
         {...props}
       >
-        <span className="group-hover:-translate-y-full relative inline-block transition-transform duration-300 ease-in-out">
-          <span className="flex items-center gap-2 opacity-100 transition-opacity duration-300 group-hover:opacity-0">
-            <span className="font-medium">{text}</span>
-          </span>
-          <span className="absolute top-full left-0 flex items-center gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-            <span className="font-medium">{slideText}</span>
+        {/* VIEWPORT — fixes the clipping */}
+        <span className="relative inline-block w-full overflow-hidden">
+
+          {/* SLIDER — moves left on hover */}
+          <span className="flex w-[200%] transition-transform duration-400 ease-in-out group-hover:-translate-x-1/2">
+
+            {/* Default Text */}
+            <span className="flex w-1/2 items-center justify-center gap-2">
+              <span className="font-medium">{text}</span>
+            </span>
+
+            {/* Hover Text (fully visible now) */}
+            <span className="flex w-1/2 items-center justify-center gap-2">
+              <span className="font-medium">{slideText}</span>
+            </span>
+
           </span>
         </span>
       </Link>

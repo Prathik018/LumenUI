@@ -17,12 +17,24 @@ export function ThemeToggle() {
     return null;
   }
 
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+
+    // Check if the browser supports View Transitions API
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        setTheme(newTheme);
+      });
+    } else {
+      // Fallback for browsers that don't support View Transitions
+      setTheme(newTheme);
+    }
+  };
+
   return (
     <Button
       className="cursor-pointer rounded-lg border border-transparent px-2 py-0.5 transition-all hover:border-zinc-200 hover:bg-zinc-50 dark:hover:border-zinc-800 dark:hover:bg-zinc-900"
-      onClick={() => {
-        setTheme(theme === "dark" ? "light" : "dark");
-      }}
+      onClick={toggleTheme}
       size="sm"
       variant="ghost"
     >

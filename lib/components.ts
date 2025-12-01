@@ -19,13 +19,10 @@ export const componentsList: Component[] = [
     { name: "Slide Text Button", slug: "slide-text-button", category: "Buttons" },
     { name: "Social Button", slug: "social-button", category: "Buttons" },
     { name: "Switch Button", slug: "switch-button", category: "Buttons" },
-    { name: "V0 Button", slug: "v0-button", category: "Buttons" },
 
     { name: "Apple Activity Card", slug: "apple-activity-card", category: "Cards" },
     { name: "Card Flip", slug: "card-flip", category: "Cards" },
     { name: "Card Stack", slug: "card-stack", category: "Cards" },
-    { name: "Carousel Cards", slug: "carousel-cards", category: "Cards" },
-    { name: "Liquid Glass Card", slug: "liquid-glass-card", category: "Cards" },
     { name: "Mouse Effect Card", slug: "mouse-effect-card", category: "Cards" },
     { name: "Tweet Card", slug: "tweet-card", category: "Cards" },
 
@@ -52,10 +49,8 @@ export const componentsList: Component[] = [
     { name: "Shape Hero", slug: "shape-hero", category: "Layout" },
 
     { name: "Currency Transfer", slug: "currency-transfer", category: "Interactive" },
-    { name: "Profile Dropdown", slug: "profile-dropdown", category: "Interactive" },
     { name: "Smooth Drawer", slug: "smooth-drawer", category: "Interactive" },
     { name: "Smooth Tab", slug: "smooth-tab", category: "Interactive" },
-    { name: "Team Selector", slug: "team-selector", category: "Interactive" },
     { name: "Toolbar", slug: "toolbar", category: "Interactive" },
 ];
 
