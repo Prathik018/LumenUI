@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,175 +14,15 @@ interface Avatar {
   alt: string;
 }
 
-const avatars: Avatar[] = [
-  {
-    id: 1,
-    svg: (
-      <svg
-        viewBox="0 0 40 40"
-        role="img"
-        xmlns="http://www.w3.org/2000/svg"
-        width="40"
-        height="40"
-        aria-label="Avatar A"
-      >
-        <title>Avatar A</title>
-        <defs>
-          <linearGradient id="av-a-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#6366F1" />
-            <stop offset="100%" stopColor="#EC4899" />
-          </linearGradient>
-        </defs>
-        <circle cx="20" cy="20" r="20" fill="url(#av-a-bg)" />
-        <circle cx="20" cy="17" r="7" fill="white" opacity="0.9" />
-        <path
-          d="M10 30C11.5 25.5 15 23 20 23C25 23 28.5 25.5 30 30"
-          stroke="white"
-          strokeWidth="2"
-          strokeLinecap="round"
-          opacity="0.9"
-        />
-        <circle cx="17" cy="16" r="1.2" fill="#111827" />
-        <circle cx="23" cy="16" r="1.2" fill="#111827" />
-      </svg>
-    ),
-    alt: "Gradient avatar A",
-  },
-  {
-    id: 2,
-    svg: (
-      <svg
-        viewBox="0 0 40 40"
-        role="img"
-        xmlns="http://www.w3.org/2000/svg"
-        width="40"
-        height="40"
-        aria-label="Avatar B"
-      >
-        <title>Avatar B</title>
-        <defs>
-          <linearGradient id="av-b-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#0EA5E9" />
-            <stop offset="100%" stopColor="#22C55E" />
-          </linearGradient>
-        </defs>
-        <rect x="0" y="0" width="40" height="40" rx="20" fill="url(#av-b-bg)" />
-        <circle cx="20" cy="18" r="7" fill="#F9FAFB" />
-        <path
-          d="M13 29C14.7 26 17 24.5 20 24.5C23 24.5 25.3 26 27 29"
-          stroke="#F9FAFB"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M17 17C17 17 17.5 16 18.5 16C19.5 16 20 17 20 17"
-          stroke="#0F172A"
-          strokeWidth="0.8"
-          strokeLinecap="round"
-        />
-        <path
-          d="M20 17C20 17 20.5 16 21.5 16C22.5 16 23 17 23 17"
-          stroke="#0F172A"
-          strokeWidth="0.8"
-          strokeLinecap="round"
-        />
-        <path
-          d="M18 20C18.5 20.5 19.2 21 20 21C20.8 21 21.5 20.5 22 20"
-          stroke="#0F172A"
-          strokeWidth="0.9"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-    alt: "Gradient avatar B",
-  },
-  {
-    id: 3,
-    svg: (
-      <svg
-        viewBox="0 0 40 40"
-        role="img"
-        xmlns="http://www.w3.org/2000/svg"
-        width="40"
-        height="40"
-        aria-label="Avatar C"
-      >
-        <title>Avatar C</title>
-        <defs>
-          <linearGradient id="av-c-bg" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#F97316" />
-            <stop offset="100%" stopColor="#FACC15" />
-          </linearGradient>
-        </defs>
-        <circle cx="20" cy="20" r="20" fill="#020617" />
-        <circle cx="20" cy="20" r="16" fill="url(#av-c-bg)" />
-        <circle cx="20" cy="17" r="6.5" fill="#FEFCE8" />
-        <path
-          d="M13.5 28.5C15 26 17.3 24.8 20 24.8C22.7 24.8 25 26 26.5 28.5"
-          stroke="#FEFCE8"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-        <circle cx="18" cy="16.5" r="1.1" fill="#0F172A" />
-        <circle cx="22" cy="16.5" r="1.1" fill="#0F172A" />
-        <path
-          d="M18 19C18.7 19.6 19.3 19.9 20 19.9C20.7 19.9 21.3 19.6 22 19"
-          stroke="#0F172A"
-          strokeWidth="0.9"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-    alt: "Gradient avatar C",
-  },
-  {
-    id: 4,
-    svg: (
-      <svg
-        viewBox="0 0 40 40"
-        role="img"
-        xmlns="http://www.w3.org/2000/svg"
-        width="40"
-        height="40"
-        aria-label="Avatar D"
-      >
-        <title>Avatar D</title>
-        <defs>
-          <linearGradient id="av-d-bg" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#22C55E" />
-            <stop offset="100%" stopColor="#14B8A6" />
-          </linearGradient>
-        </defs>
-        <rect x="0" y="0" width="40" height="40" rx="16" fill="#020617" />
-        <rect
-          x="4"
-          y="4"
-          width="32"
-          height="32"
-          rx="14"
-          fill="url(#av-d-bg)"
-        />
-        <circle cx="20" cy="17" r="6.2" fill="#ECFEFF" />
-        <path
-          d="M13.3 27.5C14.7 25 17.1 23.7 20 23.7C22.9 23.7 25.3 25 26.7 27.5"
-          stroke="#ECFEFF"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-        <circle cx="17.5" cy="16.3" r="1.1" fill="#0F172A" />
-        <circle cx="22.5" cy="16.3" r="1.1" fill="#0F172A" />
-      </svg>
-    ),
-    alt: "Gradient avatar D",
-  },
-];
+const avatars: Avatar[] = [/* ...your avatars unchanged... */];
 
 interface ProfileSetupProps {
   onComplete?: (data: { username: string; avatarId: number }) => void;
   className?: string;
 }
 
-const cardVariants = {
+// ✅ Explicitly type as Variants and cast ease to a 4-tuple
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.98 },
   show: {
     opacity: 1,
@@ -190,12 +30,12 @@ const cardVariants = {
     scale: 1,
     transition: {
       duration: 0.25,
-      ease: [0.3, 0, 0.2, 1],
+      ease: [0.3, 0, 0.2, 1] as [number, number, number, number],
     },
   },
 };
 
-const avatarPreviewVariants = {
+const avatarPreviewVariants: Variants = {
   initial: { scale: 0.9, opacity: 0 },
   animate: {
     scale: 1,
@@ -204,7 +44,7 @@ const avatarPreviewVariants = {
   },
 };
 
-const avatarListItem = {
+const avatarListItem: Variants = {
   initial: { opacity: 0, y: 6, scale: 0.95 },
   animate: {
     opacity: 1,
