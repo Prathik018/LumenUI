@@ -14,14 +14,18 @@ interface Avatar {
   alt: string;
 }
 
-const avatars: Avatar[] = [/* ...your avatars unchanged... */];
+// TODO: put your real avatars here
+const avatars: Avatar[] = [
+  // Example:
+  // { id: 1, svg: <YourAvatarIcon1 />, alt: "Avatar 1" },
+  // { id: 2, svg: <YourAvatarIcon2 />, alt: "Avatar 2" },
+];
 
 interface ProfileSetupProps {
   onComplete?: (data: { username: string; avatarId: number }) => void;
   className?: string;
 }
 
-// ✅ Explicitly type as Variants and cast ease to a 4-tuple
 const cardVariants: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.98 },
   show: {
@@ -54,8 +58,16 @@ const avatarListItem: Variants = {
   },
 };
 
+const fallbackAvatar: Avatar = {
+  id: 0,
+  svg: null,
+  alt: "Default avatar",
+};
+
 export default function ProfileSetup({ onComplete, className }: ProfileSetupProps) {
-  const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(avatars[0]);
+  const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(
+    avatars[0] ?? fallbackAvatar
+  );
   const [username, setUsername] = useState("");
   const [flip, setFlip] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -64,6 +76,7 @@ export default function ProfileSetup({ onComplete, className }: ProfileSetupProp
   const showError = username.trim().length > 0 && username.trim().length < 3;
 
   const handleAvatarSelect = (avatar: Avatar) => {
+    if (!avatar) return;
     if (avatar.id === selectedAvatar.id) return;
     setSelectedAvatar(avatar);
     setFlip((prev) => !prev);
@@ -71,7 +84,10 @@ export default function ProfileSetup({ onComplete, className }: ProfileSetupProp
 
   const handleSubmit = () => {
     if (!isValid || !onComplete) return;
-    onComplete({ username: username.trim(), avatarId: selectedAvatar.id });
+    onComplete({
+      username: username.trim(),
+      avatarId: selectedAvatar.id,
+    });
   };
 
   return (
@@ -136,7 +152,9 @@ export default function ProfileSetup({ onComplete, className }: ProfileSetupProp
                     className="relative flex h-full w-full items-center justify-center rounded-3xl border border-border/70 bg-background/80 shadow-sm shadow-primary/15"
                     style={{ backfaceVisibility: "hidden" }}
                   >
-                    <div className="scale-[1.9]">{selectedAvatar.svg}</div>
+                    {selectedAvatar.svg && (
+                      <div className="scale-[1.9]">{selectedAvatar.svg}</div>
+                    )}
                   </motion.div>
                 </motion.div>
                 <span className="text-[11px] text-muted-foreground">
@@ -146,14 +164,17 @@ export default function ProfileSetup({ onComplete, className }: ProfileSetupProp
 
               {/* Avatar options + username */}
               <div className="flex flex-col gap-4">
-                {/* Avatar grid – no scroll */}
+                {/* Avatar grid */}
                 <motion.div
                   className="grid grid-cols-2 gap-3"
                   initial="initial"
                   animate="animate"
                 >
                   {avatars.map((avatar) => {
+                    if (!avatar) return null;
+
                     const isActive = avatar.id === selectedAvatar.id;
+
                     return (
                       <motion.button
                         key={avatar.id}
