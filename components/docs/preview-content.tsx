@@ -6,7 +6,7 @@ import {
     useRef,
     type RefObject,
 } from "react";
-import { Code, CheckCheck } from "lucide-react";
+import { Code, CheckCheck, RotateCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -63,10 +63,12 @@ export default function PreviewContent({
     link,
     prePath,
     isBlock = false,
+    onRefresh,
 }: {
     link: string;
     prePath: string;
     isBlock?: boolean;
+    onRefresh?: () => void;
 }) {
     const [isCopied, setIsCopied] = useState(false);
     const [selectedTab, setSelectedTab] = useState<"npm" | "pnpm" | "bun">("npm");
@@ -112,6 +114,10 @@ export default function PreviewContent({
         }
     };
 
+    const handleRefresh = () => {
+        onRefresh?.();
+    };
+
     return (
         <>
             {isCopied && (
@@ -155,20 +161,33 @@ export default function PreviewContent({
                     </Button>
 
                     {!isBlock && (
-                        <Button
-                            ref={copyButtonRef}
-                            variant="default"
-                            size="sm"
-                            onClick={handleCopyCode}
-                            className="h-7 text-xs"
-                        >
-                            {isCopied ? (
-                                <CheckCheck className="h-3.5 w-3.5 mr-1" />
-                            ) : (
-                                <Code className="h-3.5 w-3.5 mr-1" />
-                            )}
-                            Copy Code
-                        </Button>
+                        <>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleRefresh}
+                                className="h-7 text-xs"
+                                title="Refresh component"
+                            >
+                                <RotateCw className="h-3.5 w-3.5 mr-1" />
+                                Refresh
+                            </Button>
+
+                            <Button
+                                ref={copyButtonRef}
+                                variant="default"
+                                size="sm"
+                                onClick={handleCopyCode}
+                                className="h-7 text-xs"
+                            >
+                                {isCopied ? (
+                                    <CheckCheck className="h-3.5 w-3.5 mr-1" />
+                                ) : (
+                                    <Code className="h-3.5 w-3.5 mr-1" />
+                                )}
+                                Copy Code
+                            </Button>
+                        </>
                     )}
                 </div>
             </div>

@@ -6,6 +6,8 @@ import fs from "fs";
 import path from "path";
 import ComponentPreview from "@/components/docs/component-preview";
 
+import CodeBlock from "@/components/docs/code-block";
+
 export function generateStaticParams() {
     return componentsList.map((component) => ({
         slug: component.slug,
@@ -54,10 +56,24 @@ export default async function ComponentPage({ params }: { params: Promise<{ slug
                 <h1 className="text-3xl font-bold tracking-tight">{componentName}</h1>
 
             </div>
-            <div className="flex-1 overflow-auto px-6 py-6">
+            <div className="flex-1 overflow-auto px-6 py-6 pb-20">
                 <ComponentPreview code={code}>
                     <Component />
                 </ComponentPreview>
+
+                {componentData?.install && (
+                    <div className="mt-12">
+                        <h2 className="text-xl font-semibold tracking-tight mb-4">Installation</h2>
+                        <CodeBlock code={componentData.install} language="bash" />
+                    </div>
+                )}
+
+                {componentData?.usage && (
+                    <div className="mt-12">
+                        <h2 className="text-xl font-semibold tracking-tight mb-4">Usage</h2>
+                        <CodeBlock code={componentData.usage} language="tsx" />
+                    </div>
+                )}
             </div>
         </div>
     );

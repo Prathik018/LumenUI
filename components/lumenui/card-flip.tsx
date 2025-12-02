@@ -1,199 +1,196 @@
 "use client";
 
-
-
 import { cn } from "@/lib/utils";
 import { ArrowRight, Repeat2 } from "lucide-react";
 import { useState } from "react";
 
 export interface CardFlipProps {
-    title?: string;
-    subtitle?: string;
-    description?: string;
-    features?: string[];
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  features?: string[];
+  className?: string;
 }
 
 export default function CardFlip({
-    title = "Design Systems",
-    subtitle = "Explore the fundamentals",
-    description = "Dive deep into the world of modern UI/UX design.",
-    features = ["UI/UX", "Modern Design", "Tailwind CSS", "Kokonut UI"],
+  title = "AI Workspace",
+  subtitle = "Bring all your tools into one place",
+  description = "A unified canvas for chat, files, notes, and automations. Designed for fast, focused work.",
+  features = ["Unified inbox", "Command palette", "Realtime sync", "Keyboard-first UX"],
+  className,
 }: CardFlipProps) {
-    const [isFlipped, setIsFlipped] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
 
-    return (
+  return (
+    <div
+      className={cn(
+        "relative w-full max-w-[280px] h-[320px] group [perspective:1600px]",
+        className
+      )}
+      onMouseEnter={() => setIsFlipped(true)}
+      onMouseLeave={() => setIsFlipped(false)}
+    >
+      <div
+        className={cn(
+          "relative w-full h-full",
+          "[transform-style:preserve-3d]",
+          "transition-transform duration-700",
+          isFlipped ? "[transform:rotateY(180deg)]" : "[transform:rotateY(0deg)]"
+        )}
+      >
+        {/* FRONT */}
         <div
-            className="relative w-full max-w-[280px] h-[320px] group [perspective:2000px]"
-            onMouseEnter={() => setIsFlipped(true)}
-            onMouseLeave={() => setIsFlipped(false)}
+          className={cn(
+            "absolute inset-0 w-full h-full",
+            "[backface-visibility:hidden] [transform:rotateY(0deg)]",
+            "overflow-hidden rounded-2xl",
+            // Use semantic tokens instead of hard-coded light/dark colors
+            "bg-gradient-to-br from-background via-background to-muted",
+            "border border-border",
+            "transition-all duration-700",
+            isFlipped ? "opacity-0" : "opacity-100"
+          )}
         >
-            <div
-                className={cn(
-                    "relative w-full h-full",
-                    "[transform-style:preserve-3d]",
-                    "transition-all duration-700",
-                    isFlipped
-                        ? "[transform:rotateY(180deg)]"
-                        : "[transform:rotateY(0deg)]"
-                )}
-            >
-                <div
-                    className={cn(
-                        "absolute inset-0 w-full h-full",
-                        "[backface-visibility:hidden] [transform:rotateY(0deg)]",
-                        "overflow-hidden rounded-2xl",
-                        "bg-zinc-50 dark:bg-zinc-900",
-                        "border border-zinc-200 dark:border-zinc-800/50",
-                        "shadow-xs dark:shadow-lg",
-                        "transition-all duration-700",
-                        "group-hover:shadow-lg dark:group-hover:shadow-xl",
-                        isFlipped ? "opacity-0" : "opacity-100"
-                    )}
-                >
-                    <div className="relative h-full overflow-hidden bg-gradient-to-b from-zinc-100 to-white dark:from-zinc-900 dark:to-black">
-                        <div className="absolute inset-0 flex items-start justify-center pt-24">
-                            <div className="relative w-[200px] h-[100px] flex items-center justify-center">
-                                {[...Array(10)].map((_, i) => (
-                                    <div
-                                        key={i}
-                                        className={cn(
-                                            "absolute w-[50px] h-[50px]",
-                                            "rounded-[140px]",
-                                            "animate-[scale_3s_linear_infinite]",
-                                            "opacity-0",
-                                            "shadow-[0_0_50px_rgba(255,165,0,0.5)]",
-                                            "group-hover:animate-[scale_2s_linear_infinite]"
-                                        )}
-                                        style={{
-                                            animationDelay: `${i * 0.3}s`,
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+          {/* subtle background decoration (use primary instead of orange) */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute -top-16 -right-10 h-32 w-32 rounded-full bg-primary/10 blur-3xl" />
+            <div className="absolute bottom-0 left-0 h-28 w-28 rounded-full bg-primary/10 blur-3xl" />
+          </div>
 
-                    <div className="absolute bottom-0 left-0 right-0 p-5">
-                        <div className="flex items-center justify-between gap-3">
-                            <div className="space-y-1.5">
-                                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white leading-snug tracking-tighter transition-all duration-500 ease-out-expo group-hover:translate-y-[-4px]">
-                                    {title}
-                                </h3>
-                                <p className="text-sm text-zinc-600 dark:text-zinc-200 line-clamp-2 tracking-tight transition-all duration-500 ease-out-expo group-hover:translate-y-[-4px] delay-[50ms]">
-                                    {subtitle}
-                                </p>
-                            </div>
-                            <div className="relative group/icon">
-                                <div
-                                    className={cn(
-                                        "absolute inset-[-8px] rounded-lg transition-opacity duration-300",
-                                        "bg-gradient-to-br from-orange-500/20 via-orange-500/10 to-transparent"
-                                    )}
-                                />
-                                <Repeat2 className="relative z-10 w-4 h-4 text-orange-500 transition-transform duration-300 group-hover/icon:scale-110 group-hover/icon:-rotate-12" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Back of card */}
-                <div
-                    className={cn(
-                        "absolute inset-0 w-full h-full",
-                        "[backface-visibility:hidden] [transform:rotateY(180deg)]",
-                        "p-6 rounded-2xl",
-                        "bg-gradient-to-b from-zinc-100 to-white dark:from-zinc-900 dark:to-black",
-                        "border border-zinc-200 dark:border-zinc-800",
-                        "shadow-xs dark:shadow-lg",
-                        "flex flex-col",
-                        "transition-all duration-700",
-                        "group-hover:shadow-lg dark:group-hover:shadow-xl",
-                        !isFlipped ? "opacity-0" : "opacity-100"
-                    )}
-                >
-                    <div className="flex-1 space-y-6">
-                        <div className="space-y-2">
-                            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white leading-snug tracking-tight transition-all duration-500 ease-out-expo group-hover:translate-y-[-2px]">
-                                {title}
-                            </h3>
-                            <p className="text-sm text-zinc-600 dark:text-zinc-400 tracking-tight transition-all duration-500 ease-out-expo group-hover:translate-y-[-2px] line-clamp-2">
-                                {description}
-                            </p>
-                        </div>
-
-                        <div className="space-y-2">
-                            {features.map((feature, index) => (
-                                <div
-                                    key={feature}
-                                    className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300 transition-all duration-500"
-                                    style={{
-                                        transform: isFlipped
-                                            ? "translateX(0)"
-                                            : "translateX(-10px)",
-                                        opacity: isFlipped ? 1 : 0,
-                                        transitionDelay: `${
-                                            index * 100 + 200
-                                        }ms`,
-                                    }}
-                                >
-                                    <ArrowRight className="w-3 h-3 text-orange-500" />
-                                    <span>{feature}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="pt-6 mt-6 border-t border-zinc-200 dark:border-zinc-800">
-                        <div
-                            className={cn(
-                                "group/start relative",
-                                "flex items-center justify-between",
-                                "p-3 -m-3 rounded-xl",
-                                "transition-all duration-300",
-                                "bg-gradient-to-r from-zinc-100 via-zinc-100 to-zinc-100",
-                                "dark:from-zinc-800 dark:via-zinc-800 dark:to-zinc-800",
-                                "hover:from-orange-500/10 hover:from-0% hover:via-orange-500/5 hover:via-100% hover:to-transparent hover:to-100%",
-                                "dark:hover:from-orange-500/20 dark:hover:from-0% dark:hover:via-orange-500/10 dark:hover:via-100% dark:hover:to-transparent dark:hover:to-100%",
-                                "hover:scale-[1.02] hover:cursor-pointer"
-                            )}
-                        >
-                            <span className="text-sm font-medium text-zinc-900 dark:text-white transition-colors duration-300 group-hover/start:text-orange-600 dark:group-hover/start:text-orange-400">
-                                Start today
-                            </span>
-                            <div className="relative group/icon">
-                                <div
-                                    className={cn(
-                                        "absolute inset-[-6px] rounded-lg transition-all duration-300",
-                                        "bg-gradient-to-br from-orange-500/20 via-orange-500/10 to-transparent",
-                                        "opacity-0 group-hover/start:opacity-100 scale-90 group-hover/start:scale-100"
-                                    )}
-                                />
-                                <ArrowRight className="relative z-10 w-4 h-4 text-orange-500 transition-all duration-300 group-hover/start:translate-x-0.5 group-hover/start:scale-110" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          <div className="relative flex h-full flex-col justify-between p-5">
+            {/* Top pill + icon */}
+            <div className="flex items-center justify-between gap-3">
+              <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/5 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+                New Space
+              </span>
+              <div className="relative flex items-center justify-center rounded-full bg-foreground text-background h-7 w-7">
+                <Repeat2 className="h-3.5 w-3.5" />
+              </div>
             </div>
 
-            <style jsx>{`
-                @keyframes scale {
-                    0% {
-                        transform: scale(2);
-                        opacity: 0;
-                        box-shadow: 0px 0px 50px rgba(255, 165, 0, 0.5);
-                    }
-                    50% {
-                        transform: translate(0px, -5px) scale(1);
-                        opacity: 1;
-                        box-shadow: 0px 8px 20px rgba(255, 165, 0, 0.5);
-                    }
-                    100% {
-                        transform: translate(0px, 5px) scale(0.1);
-                        opacity: 0;
-                        box-shadow: 0px 10px 20px rgba(255, 165, 0, 0);
-                    }
-                }
-            `}</style>
+            {/* Title & subtitle */}
+            <div className="mt-6 space-y-2">
+              <h3 className="text-lg font-semibold text-foreground leading-snug tracking-tight">
+                {title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-snug line-clamp-3">
+                {subtitle}
+              </p>
+            </div>
+
+            {/* Bottom row */}
+            <div className="mt-6 flex items-center justify-between">
+              <div className="flex flex-col gap-1 text-xs">
+                <span className="text-muted-foreground">
+                  Hover to preview details
+                </span>
+                <div className="flex gap-1.5 items-center">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="text-[11px] text-muted-foreground">
+                    Realtime, synced, multiplayer
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative group/icon">
+                <div
+                  className={cn(
+                    "absolute inset-[-6px] rounded-xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent",
+                    "opacity-0 group-hover/icon:opacity-100",
+                    "scale-90 group-hover/icon:scale-100",
+                    "transition-all duration-300"
+                  )}
+                />
+                <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-foreground text-background">
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/icon:translate-x-0.5 group-hover/icon:scale-110" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-    );
+
+        {/* BACK */}
+        <div
+          className={cn(
+            "absolute inset-0 w-full h-full",
+            "[backface-visibility:hidden] [transform:rotateY(180deg)]",
+            "rounded-2xl p-5",
+            // Back uses inverted / elevated card look
+            "bg-gradient-to-br from-background/95 via-background to-background",
+            "border border-border",
+            "flex flex-col",
+            "transition-all duration-700",
+            !isFlipped ? "opacity-0" : "opacity-100"
+          )}
+        >
+          {/* Back decoration */}
+          <div className="pointer-events-none absolute inset-0 opacity-70">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+            <div className="absolute -right-10 bottom-10 h-24 w-24 rounded-full bg-primary/20 blur-3xl" />
+          </div>
+
+          <div className="relative flex-1 space-y-5">
+            <div className="space-y-1.5">
+              <h3 className="text-lg font-semibold text-foreground leading-snug tracking-tight">
+                {title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-snug">
+                {description}
+              </p>
+            </div>
+
+            <div className="space-y-2.5 mt-3">
+              {features.map((feature, index) => (
+                <div
+                  key={feature}
+                  className={cn(
+                    "flex items-center gap-2 text-sm text-foreground",
+                    "transition-all duration-400"
+                  )}
+                  style={{
+                    transform: isFlipped ? "translateX(0)" : "translateX(-8px)",
+                    opacity: isFlipped ? 1 : 0,
+                    transitionDelay: `${index * 90 + 160}ms`,
+                  }}
+                >
+                  <div className="flex h-4 w-4 items-center justify-center rounded-full bg-primary/10">
+                    <ArrowRight className="h-3 w-3 text-primary" />
+                  </div>
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative pt-4 mt-4 border-t border-border/70">
+            <button
+              type="button"
+              className={cn(
+                "group/start relative flex items-center justify-between",
+                "w-full rounded-xl px-3 py-2.5",
+                "bg-muted/70 hover:bg-muted",
+                "border border-border hover:border-primary/70",
+                "transition-all duration-200"
+              )}
+            >
+              <span className="text-sm font-medium text-foreground group-hover/start:text-primary-foreground">
+                Open workspace
+              </span>
+              <div className="relative">
+                <div
+                  className={cn(
+                    "absolute inset-[-6px] rounded-lg bg-gradient-to-br from-primary/30 via-primary/10 to-transparent",
+                    "opacity-0 group-hover/start:opacity-100",
+                    "scale-90 group-hover/start:scale-100",
+                    "transition-all duration-200"
+                  )}
+                />
+                <ArrowRight className="relative z-10 h-4 w-4 text-primary transition-transform duration-200 group-hover/start:translate-x-0.5 group-hover/start:scale-110" />
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

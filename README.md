@@ -34,26 +34,6 @@ The entire library is intuitive, lightweight, and fully optimized for Next.js, o
 
 ---
 
-## Setup & Installation
-
-Follow these steps to run FluxInvoice locally:
-
-1. **Clone the Repository:**
-```bash
-git clone https://github.com/Prathik018/lumenui.git
-cd lumenui
-```
-
-2. **Install Node Module:**
-```bash
-npm i
-```
-
-3. **Start the Development Server:**
-```bash
-npm run dev
-```
-
 
 ## 🚀 About Me
 

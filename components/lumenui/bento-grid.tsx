@@ -1,5 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { motion } from "motion/react";
+import { cn } from "@/lib/utils";
 
 import Anthropic from "@/components/icons/anthropic";
 import AnthropicDark from "@/components/icons/anthropic-dark";
@@ -8,764 +12,562 @@ import OpenAI from "@/components/icons/open-ai";
 import OpenAIDark from "@/components/icons/open-ai-dark";
 import MistralAI from "@/components/icons/mistral";
 import DeepSeek from "@/components/icons/deepseek";
-import { cn } from "@/lib/utils";
+
 import {
-    Mic,
-    Plus,
     ArrowUpRight,
-    CheckCircle2,
     Clock,
+    Mic,
     Sparkles,
     Zap,
+    Plus,
 } from "lucide-react";
-import {
-    motion,
-    useMotionValue,
-    useTransform,
-    type Variants,
-} from "motion/react";
-import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
 
-interface BentoItem {
-    id: string;
-    title: string;
-    description: string;
-    icons?: boolean;
-    href?: string;
-    feature?:
-        | "chart"
-        | "counter"
-        | "code"
-        | "timeline"
-        | "spotlight"
-        | "icons"
-        | "typing"
-        | "metrics";
-    spotlightItems?: string[];
-    timeline?: Array<{ year: string; event: string }>;
-    code?: string;
-    codeLang?: string;
-    typingText?: string;
-    metrics?: Array<{
-        label: string;
-        value: number;
-        suffix?: string;
-        color?: string;
-    }>;
-    statistic?: {
-        value: string;
-        label: string;
-        start?: number;
-        end?: number;
-        suffix?: string;
-    };
-    size?: "sm" | "md" | "lg";
-    className?: string;
-}
 
-const bentoItems: BentoItem[] = [
-    {
-        id: "main",
-        title: "Building tomorrow's technology",
-        description:
-            "We architect and develop enterprise-grade applications that scale seamlessly with cloud-native technologies and microservices.",
-        href: "#",
-        feature: "spotlight",
-        spotlightItems: [
-            "Microservices architecture",
-            "Serverless computing",
-            "Container orchestration",
-            "API-first design",
-            "Event-driven systems",
-        ],
-        size: "lg",
-        className: "col-span-2 row-span-1 md:col-span-2 md:row-span-1",
-    },
-    {
-        id: "stat1",
-        title: "AI Agents & Automation",
-        description:
-            "Intelligent agents that learn, adapt, and automate complex workflows",
-        href: "#",
-        feature: "typing",
-        typingText:
-            "const createAgent = async () => {\n  const agent = new AIAgent({\n    model: 'gpt-4-turbo',\n    tools: [codeAnalysis, dataProcessing],\n    memory: new ConversationalMemory()\n  });\n\n  // Train on domain knowledge\n  await agent.learn(domainData);\n\n  return agent;\n};",
-        size: "md",
-        className: "col-span-2 row-span-1 col-start-1 col-end-3",
-    },
-    {
-        id: "partners",
-        title: "Trusted partners",
-        description:
-            "Working with the leading AI and cloud providers to deliver cutting-edge solutions",
-        icons: true,
-        href: "#",
-        feature: "icons",
-        size: "md",
-        className: "col-span-1 row-span-1",
-    },
-    {
-        id: "innovation",
-        title: "Innovation timeline",
-        description:
-            "Pioneering the future of AI and cloud computing with breakthrough innovations",
-        href: "#",
-        feature: "timeline",
-        timeline: [
-            { year: "2020", event: "Launch of Cloud-Native Platform" },
-            { year: "2021", event: "Advanced AI Integration & LLM APIs" },
-            { year: "2022", event: "Multi-Agent Systems & RAG Architecture" },
-            { year: "2023", event: "Autonomous AI Agents & Neural Networks" },
-            {
-                year: "2024",
-                event: "AGI-Ready Infrastructure & Edge Computing",
-            },
-        ],
-        size: "sm",
-        className: "col-span-1 row-span-1",
-    },
-];
-
-const fadeInUp: Variants = {
-    hidden: { opacity: 0, y: 20 },
+const containerVariants = {
+    hidden: { opacity: 0, y: 12 },
     visible: {
         opacity: 1,
         y: 0,
         transition: {
             duration: 0.5,
-            ease: "easeOut",
+            ease: [0.16, 1, 0.3, 1] as const,
+            staggerChildren: 0.08,
+            delayChildren: 0.1,
         },
     },
-};
+} as const;
 
-const staggerContainer: Variants = {
-    hidden: { opacity: 0 },
+const cardVariants = {
+    hidden: { opacity: 0, y: 8 },
     visible: {
         opacity: 1,
+        y: 0,
         transition: {
-            staggerChildren: 0.15,
-            delayChildren: 0.3,
+            duration: 0.4,
+            ease: [0.16, 1, 0.3, 1] as const,
         },
     },
-};
+} as const;
 
-const SpotlightFeature = ({ items }: { items: string[] }) => {
+
+function ProvidersRow() {
+    const providers: Array<{
+        name: string;
+        light: React.ReactElement;
+        dark: React.ReactElement | null;
+    }> = [
+            {
+                name: "OpenAI",
+                light: <OpenAI className="h-5 w-5 dark:hidden" />,
+                dark: <OpenAIDark className="h-5 w-5 hidden dark:block" />,
+            },
+            {
+                name: "Anthropic",
+                light: <Anthropic className="h-5 w-5 dark:hidden" />,
+                dark: <AnthropicDark className="h-5 w-5 hidden dark:block" />,
+            },
+            {
+                name: "Google",
+                light: <Google className="h-5 w-5" />,
+                dark: null,
+            },
+            {
+                name: "Mistral",
+                light: <MistralAI className="h-5 w-5" />,
+                dark: null,
+            },
+            {
+                name: "DeepSeek",
+                light: <DeepSeek className="h-5 w-5" />,
+                dark: null,
+            },
+        ];
+
     return (
-        <ul className="mt-2 space-y-1.5">
-            {items.map((item, index) => (
-                <motion.li
-                    key={`spotlight-${item.toLowerCase().replace(/\s+/g, "-")}`}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    className="flex items-center gap-2"
+        <div className="flex flex-wrap items-center gap-3">
+            {providers.map((p) => (
+                <div
+                    key={p.name}
+                    className="inline-flex items-center gap-2 rounded-full border border-neutral-200/70 bg-neutral-50/80 px-3 py-1.5 text-[11px] font-medium text-neutral-700 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900/80 dark:text-neutral-200"
                 >
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500 dark:text-emerald-400 flex-shrink-0" />
-                    <span className="text-sm text-neutral-700 dark:text-neutral-300">
-                        {item}
-                    </span>
-                </motion.li>
-            ))}
-        </ul>
-    );
-};
-
-const CounterAnimation = ({
-    start,
-    end,
-    suffix = "",
-}: {
-    start: number;
-    end: number;
-    suffix?: string;
-}) => {
-    const [count, setCount] = useState(start);
-
-    useEffect(() => {
-        const duration = 2000;
-        const frameRate = 1000 / 60;
-        const totalFrames = Math.round(duration / frameRate);
-
-        let currentFrame = 0;
-        const counter = setInterval(() => {
-            currentFrame++;
-            const progress = currentFrame / totalFrames;
-            const easedProgress = 1 - (1 - progress) ** 3;
-            const current = start + (end - start) * easedProgress;
-
-            setCount(Math.min(current, end));
-
-            if (currentFrame === totalFrames) {
-                clearInterval(counter);
-            }
-        }, frameRate);
-
-        return () => clearInterval(counter);
-    }, [start, end]);
-
-    return (
-        <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-                {count.toFixed(1).replace(/\.0$/, "")}
-            </span>
-            <span className="text-xl font-medium text-neutral-900 dark:text-neutral-100">
-                {suffix}
-            </span>
-        </div>
-    );
-};
-
-const ChartAnimation = ({ value }: { value: number }) => {
-    return (
-        <div className="mt-2 w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
-            <motion.div
-                className="h-full bg-emerald-500 dark:bg-emerald-400 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${value}%` }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-            />
-        </div>
-    );
-};
-
-const IconsFeature = () => {
-    return (
-        <div className="grid grid-cols-3 gap-4 mt-4">
-            <motion.div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-b from-neutral-100/80 to-neutral-100 dark:from-neutral-800/80 dark:to-neutral-800 border border-neutral-200/50 dark:border-neutral-700/50 group transition-all duration-300 hover:border-neutral-300 dark:hover:border-neutral-600">
-                <div className="relative w-8 h-8 flex items-center justify-center">
-                    <OpenAI className="w-7 h-7 dark:hidden transition-transform " />
-                    <OpenAIDark className="w-7 h-7 hidden dark:block transition-transform " />
-                </div>
-                <span className="text-xs font-medium text-center text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-200">
-                    OpenAI
-                </span>
-            </motion.div>
-            <motion.div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-b from-neutral-100/80 to-neutral-100 dark:from-neutral-800/80 dark:to-neutral-800 border border-neutral-200/50 dark:border-neutral-700/50 group transition-all duration-300 hover:border-neutral-300 dark:hover:border-neutral-600">
-                <div className="relative w-8 h-8 flex items-center justify-center">
-                    <Anthropic className="w-7 h-7 dark:hidden transition-transform " />
-                    <AnthropicDark className="w-7 h-7 hidden dark:block transition-transform " />
-                </div>
-                <span className="text-xs font-medium text-center text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-200">
-                    Anthropic
-                </span>
-            </motion.div>
-            <motion.div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-b from-neutral-100/80 to-neutral-100 dark:from-neutral-800/80 dark:to-neutral-800 border border-neutral-200/50 dark:border-neutral-700/50 group transition-all duration-300 hover:border-neutral-300 dark:hover:border-neutral-600">
-                <div className="relative w-8 h-8 flex items-center justify-center">
-                    <Google className="w-7 h-7 transition-transform " />
-                </div>
-                <span className="text-xs font-medium text-center text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-200">
-                    Google
-                </span>
-            </motion.div>
-            <motion.div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-b from-neutral-100/80 to-neutral-100 dark:from-neutral-800/80 dark:to-neutral-800 border border-neutral-200/50 dark:border-neutral-700/50 group transition-all duration-300 hover:border-neutral-300 dark:hover:border-neutral-600">
-                <div className="relative w-8 h-8 flex items-center justify-center">
-                    <MistralAI className="w-7 h-7 transition-transform " />
-                </div>
-                <span className="text-xs font-medium text-center text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-200">
-                    Mistral
-                </span>
-            </motion.div>
-            <motion.div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-b from-neutral-100/80 to-neutral-100 dark:from-neutral-800/80 dark:to-neutral-800 border border-neutral-200/50 dark:border-neutral-700/50 group transition-all duration-300 hover:border-neutral-300 dark:hover:border-neutral-600">
-                <div className="relative w-8 h-8 flex items-center justify-center">
-                    <DeepSeek className="w-7 h-7 transition-transform " />
-                </div>
-                <span className="text-xs font-medium text-center text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-200">
-                    DeepSeek
-                </span>
-            </motion.div>
-            <motion.div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gradient-to-b from-neutral-100/80 to-neutral-100 dark:from-neutral-800/80 dark:to-neutral-800 border border-neutral-200/50 dark:border-neutral-700/50 group transition-all duration-300 hover:border-neutral-300 dark:hover:border-neutral-600">
-                <div className="relative w-8 h-8 flex items-center justify-center">
-                    <Plus className="w-6 h-6 text-neutral-600 dark:text-neutral-400 transition-transform " />
-                </div>
-                <span className="text-xs font-medium text-center text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-200">
-                    More
-                </span>
-            </motion.div>
-        </div>
-    );
-};
-
-const TimelineFeature = ({
-    timeline,
-}: {
-    timeline: Array<{ year: string; event: string }>;
-}) => {
-    return (
-        <div className="mt-3 relative">
-            <div className="absolute top-0 bottom-0 left-[9px] w-[2px] bg-neutral-200 dark:bg-neutral-700" />
-            {timeline.map((item) => (
-                <motion.div
-                    key={`timeline-${item.year}-${item.event
-                        .toLowerCase()
-                        .replace(/\s+/g, "-")}`}
-                    className="flex gap-3 mb-3 relative"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                        delay: (0.15 * Number.parseInt(item.year)) % 10,
-                    }}
-                >
-                    <div className="w-5 h-5 rounded-full bg-neutral-100 dark:bg-neutral-800 border-2 border-neutral-300 dark:border-neutral-600 flex-shrink-0 z-10 mt-0.5" />
-                    <div>
-                        <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                            {item.year}
-                        </div>
-                        <div className="text-xs text-neutral-600 dark:text-neutral-400">
-                            {item.event}
-                        </div>
+                    <div className="flex items-center justify-center">
+                        {p.light}
+                        {p.dark}
                     </div>
-                </motion.div>
-            ))}
-        </div>
-    );
-};
-
-const TypingCodeFeature = ({ text }: { text: string }) => {
-    const [displayedText, setDisplayedText] = useState("");
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const terminalRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        if (currentIndex < text.length) {
-            const timeout = setTimeout(() => {
-                setDisplayedText((prev) => prev + text[currentIndex]);
-                setCurrentIndex((prev) => prev + 1);
-
-                if (terminalRef.current) {
-                    terminalRef.current.scrollTop =
-                        terminalRef.current.scrollHeight;
-                }
-            }, Math.random() * 30 + 10); // Random typing speed for realistic effect
-
-            return () => clearTimeout(timeout);
-        }
-    }, [currentIndex, text]);
-
-    // Reset animation when component unmounts and remounts
-    useEffect(() => {
-        setDisplayedText("");
-        setCurrentIndex(0);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    return (
-        <div className="mt-3 relative">
-            <div className="flex items-center gap-2 mb-2">
-                <div className="text-xs text-neutral-500 dark:text-neutral-400">
-                    server.ts
+                    <span>{p.name}</span>
                 </div>
-            </div>
-            <div
-                ref={terminalRef}
-                className="bg-neutral-900 dark:bg-black text-neutral-100 p-3 rounded-md text-xs font-mono h-[150px] overflow-y-auto"
-            >
-                <pre className="whitespace-pre-wrap">
-                    {displayedText}
-                    <span className="animate-pulse">|</span>
-                </pre>
+            ))}
+            <div className="inline-flex items-center gap-2 rounded-full border border-dashed border-neutral-200/80 bg-transparent px-3 py-1.5 text-[11px] font-medium text-neutral-500 dark:border-neutral-800/80 dark:text-neutral-400">
+                <Plus className="h-3.5 w-3.5" /> Connect more
             </div>
         </div>
     );
-};
+}
 
-const MetricsFeature = ({
-    metrics,
+function MetricRow({
+    label,
+    value,
+    suffix,
+    accent,
 }: {
-    metrics: Array<{
-        label: string;
-        value: number;
-        suffix?: string;
-        color?: string;
-    }>;
-}) => {
-    const getColorClass = (color = "emerald") => {
-        const colors = {
-            emerald: "bg-emerald-500 dark:bg-emerald-400",
-            blue: "bg-blue-500 dark:bg-blue-400",
-            violet: "bg-violet-500 dark:bg-violet-400",
-            amber: "bg-amber-500 dark:bg-amber-400",
-            rose: "bg-rose-500 dark:bg-rose-400",
-        };
-        return colors[color as keyof typeof colors] || colors.emerald;
+    label: string;
+    value: string;
+    suffix?: string;
+    accent?: "green" | "blue" | "amber";
+}) {
+    const colorMap: Record<string, string> = {
+        green: "bg-emerald-500/80",
+        blue: "bg-sky-500/80",
+        amber: "bg-amber-500/80",
     };
 
     return (
-        <div className="mt-3 space-y-3">
-            {metrics.map((metric, index) => (
-                <motion.div
-                    key={`metric-${metric.label
-                        .toLowerCase()
-                        .replace(/\s+/g, "-")}`}
-                    className="space-y-1"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 * index }}
+        <div className="flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 text-neutral-500 dark:text-neutral-400">
+                <span
+                    className={cn(
+                        "h-1.5 w-1.5 rounded-full",
+                        accent ? colorMap[accent] : "bg-neutral-400/70"
+                    )}
+                />
+                <span>{label}</span>
+            </div>
+            <div className="flex items-baseline gap-1 font-medium text-neutral-900 dark:text-neutral-100">
+                <span>{value}</span>
+                {suffix && (
+                    <span className="text-[10px] text-neutral-500 dark:text-neutral-400">
+                        {suffix}
+                    </span>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function ActivityList() {
+    const items = [
+        {
+            id: 1,
+            label: "Deployed new agent: pricing-optimizer",
+            time: "2 min ago",
+            badge: "Production",
+        },
+        {
+            id: 2,
+            label: "Fine-tuned: support-classifier-v2",
+            time: "14 min ago",
+            badge: "Training",
+        },
+        {
+            id: 3,
+            label: "Connected new MCP: postgres-cluster-eu",
+            time: "32 min ago",
+            badge: "Infra",
+        },
+    ];
+
+    return (
+        <div className="mt-3 space-y-2">
+            {items.map((item) => (
+                <div
+                    key={item.id}
+                    className="rounded-lg border border-neutral-200/70 bg-neutral-50/70 px-3 py-2 text-xs text-neutral-700 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900/60 dark:text-neutral-200"
                 >
-                    <div className="flex justify-between items-center text-sm">
-                        <div className="text-neutral-700 dark:text-neutral-300 font-medium flex items-center gap-1.5">
-                            {metric.label === "Uptime" && (
-                                <Clock className="w-3.5 h-3.5" />
-                            )}
-                            {metric.label === "Response time" && (
-                                <Zap className="w-3.5 h-3.5" />
-                            )}
-                            {metric.label === "Cost reduction" && (
-                                <Sparkles className="w-3.5 h-3.5" />
-                            )}
-                            {metric.label}
-                        </div>
-                        <div className="text-neutral-700 dark:text-neutral-300 font-semibold">
-                            {metric.value}
-                            {metric.suffix}
-                        </div>
+                    <div className="flex items-center justify-between gap-3">
+                        <span className="line-clamp-1">{item.label}</span>
+                        <span className="rounded-full bg-neutral-900 text-[9px] font-medium uppercase tracking-[0.12em] text-neutral-100 dark:bg-neutral-100 dark:text-neutral-900 px-1.5 py-0.5">
+                            {item.badge}
+                        </span>
                     </div>
-                    <div className="h-1.5 w-full bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
-                        <motion.div
-                            className={`h-full rounded-full ${getColorClass(
-                                metric.color
-                            )}`}
-                            initial={{ width: 0 }}
-                            animate={{
-                                width: `${Math.min(100, metric.value)}%`,
-                            }}
-                            transition={{
-                                duration: 1.2,
-                                ease: "easeOut",
-                                delay: 0.15 * index,
-                            }}
-                        />
+                    <div className="mt-1 flex items-center gap-1 text-[10px] text-neutral-400">
+                        <Clock className="h-3 w-3" />
+                        <span>{item.time}</span>
                     </div>
-                </motion.div>
+                </div>
             ))}
         </div>
     );
-};
+}
 
-function AIInput_Voice() {
-    const [submitted, setSubmitted] = useState(false);
+function VoiceWidget() {
+    const [listening, setListening] = useState(false);
     const [time, setTime] = useState(0);
-    const [isClient, setIsClient] = useState(false);
-    const [isDemo, setIsDemo] = useState(true);
+    const [demo, setDemo] = useState(true);
 
     useEffect(() => {
-        setIsClient(true);
-    }, []);
-
-    useEffect(() => {
-        let intervalId: NodeJS.Timeout;
-
-        if (submitted) {
-            intervalId = setInterval(() => {
+        let timer: NodeJS.Timeout | undefined;
+        if (listening) {
+            timer = setInterval(() => {
                 setTime((t) => t + 1);
             }, 1000);
         } else {
             setTime(0);
         }
 
-        return () => clearInterval(intervalId);
-    }, [submitted]);
-
-    const formatTime = (seconds: number) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins.toString().padStart(2, "0")}:${secs
-            .toString()
-            .padStart(2, "0")}`;
-    };
+        return () => {
+            if (timer) clearInterval(timer);
+        };
+    }, [listening]);
 
     useEffect(() => {
-        if (!isDemo) return;
-
-        let timeoutId: NodeJS.Timeout;
-        const runAnimation = () => {
-            setSubmitted(true);
-            timeoutId = setTimeout(() => {
-                setSubmitted(false);
-                timeoutId = setTimeout(runAnimation, 1000);
-            }, 3000);
+        if (!demo) return;
+        let loop: NodeJS.Timeout | undefined;
+        const run = () => {
+            setListening(true);
+            loop = setTimeout(() => {
+                setListening(false);
+                loop = setTimeout(run, 1400);
+            }, 2600);
         };
-
-        const initialTimeout = setTimeout(runAnimation, 100);
+        const first = setTimeout(run, 200);
         return () => {
-            clearTimeout(timeoutId);
-            clearTimeout(initialTimeout);
+            clearTimeout(first);
+            if (loop) clearTimeout(loop);
         };
-    }, [isDemo]);
+    }, [demo]);
 
-    const handleClick = () => {
-        if (isDemo) {
-            setIsDemo(false);
-            setSubmitted(false);
-        } else {
-            setSubmitted((prev) => !prev);
-        }
+    const formatTime = (seconds: number) => {
+        const m = Math.floor(seconds / 60)
+            .toString()
+            .padStart(2, "0");
+        const s = (seconds % 60).toString().padStart(2, "0");
+        return `${m}:${s}`;
     };
 
     return (
-        <div className="w-full py-4">
-            <div className="relative max-w-xl w-full mx-auto flex items-center flex-col gap-2">
+        <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between text-xs">
+                <span className="inline-flex items-center gap-1 text-neutral-600 dark:text-neutral-300">
+                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-neutral-900 text-[9px] font-semibold text-neutral-50 dark:bg-neutral-100 dark:text-neutral-900">
+                        AI
+                    </span>
+                    Voice console
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                    <Sparkles className="h-3 w-3" />
+                    Beta
+                </span>
+            </div>
+
+            <div className="mt-1 flex items-center gap-3 rounded-xl border border-neutral-200/70 bg-neutral-50/70 px-3 py-2.5 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900/70">
                 <button
-                    className={cn(
-                        "group w-16 h-16 rounded-xl flex items-center justify-center transition-colors",
-                        submitted
-                            ? "bg-none"
-                            : "bg-none hover:bg-black/10 dark:hover:bg-white/10"
-                    )}
                     type="button"
-                    onClick={handleClick}
+                    onClick={() => {
+                        if (demo) {
+                            setDemo(false);
+                            setListening(false);
+                        } else {
+                            setListening((prev) => !prev);
+                        }
+                    }}
+                    className={cn(
+                        "inline-flex h-10 w-10 items-center justify-center rounded-full border text-neutral-900 dark:text-neutral-100 transition-all",
+                        listening
+                            ? "border-emerald-400 bg-emerald-50 dark:border-emerald-500/70 dark:bg-emerald-900/40"
+                            : "border-neutral-200 bg-white/80 hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 hover:dark:bg-neutral-800"
+                    )}
                 >
-                    {submitted ? (
-                        <div
-                            className="w-6 h-6 rounded-sm animate-spin bg-black  dark:bg-white cursor-pointer pointer-events-auto"
-                            style={{ animationDuration: "3s" }}
-                        />
+                    {listening ? (
+                        <div className="relative flex h-5 w-5 items-center justify-center">
+                            <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400/60" />
+                            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                        </div>
                     ) : (
-                        <Mic className="w-6 h-6 text-black/70 dark:text-white/70" />
+                        <Mic className="h-5 w-5" />
                     )}
                 </button>
-
-                <span
-                    className={cn(
-                        "font-mono text-sm transition-opacity duration-300",
-                        submitted
-                            ? "text-black/70 dark:text-white/70"
-                            : "text-black/30 dark:text-white/30"
-                    )}
-                >
-                    {formatTime(time)}
-                </span>
-
-                <div className="h-4 w-64 flex items-center justify-center gap-0.5">
-                    {[...Array(48)].map((_, i) => (
-                        <div
-                            key={`voice-bar-${i}`}
-                            className={cn(
-                                "w-0.5 rounded-full transition-all duration-300",
-                                submitted
-                                    ? "bg-black/50 dark:bg-white/50 animate-pulse"
-                                    : "bg-black/10 dark:bg-white/10 h-1"
-                            )}
-                            style={
-                                submitted && isClient
-                                    ? {
-                                          height: `${20 + Math.random() * 80}%`,
-                                          animationDelay: `${i * 0.05}s`,
-                                      }
-                                    : undefined
-                            }
-                        />
-                    ))}
+                <div className="flex-1 space-y-1">
+                    <p className="text-[11px] text-neutral-600 dark:text-neutral-300 line-clamp-1">
+                        {listening
+                            ? "Listening… describe the workflow you want to automate."
+                            : "Tap the mic and speak to your agent in natural language."}
+                    </p>
+                    <div className="flex items-center justify-between text-[10px] text-neutral-400 dark:text-neutral-500">
+                        <span>{formatTime(time)}</span>
+                        <span className="inline-flex items-center gap-1">
+                            <Zap className="h-3 w-3" />
+                            Low-latency mode
+                        </span>
+                    </div>
                 </div>
+            </div>
 
-                <p className="h-4 text-xs text-black/70 dark:text-white/70">
-                    {submitted ? "Listening..." : "Click to speak"}
-                </p>
+            <div className="mt-1 flex h-5 w-full items-center justify-center gap-[2px]">
+                {Array.from({ length: 36 }).map((_, i) => {
+                    const height = listening
+                        ? `${20 + Math.random() * 70}%`
+                        : "18%";
+                    return (
+                        <span
+                            key={i}
+                            className={cn(
+                                "w-[2px] rounded-full bg-neutral-200 dark:bg-neutral-700 transition-all duration-200",
+                                listening &&
+                                "bg-emerald-400/80 dark:bg-emerald-300/80"
+                            )}
+                            style={{
+                                height,
+                            }}
+                        />
+                    );
+                })}
             </div>
         </div>
     );
 }
 
-const BentoCard = ({ item }: { item: BentoItem }) => {
-    const [isHovered, setIsHovered] = useState(false);
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-    const rotateX = useTransform(y, [-100, 100], [2, -2]);
-    const rotateY = useTransform(x, [-100, 100], [-2, 2]);
 
-    function handleMouseMove(event: React.MouseEvent<HTMLDivElement>) {
-        const rect = event.currentTarget.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        const mouseX = event.clientX - rect.left;
-        const mouseY = event.clientY - rect.top;
-        const xPct = mouseX / width - 0.5;
-        const yPct = mouseY / height - 0.5;
-        x.set(xPct * 100);
-        y.set(yPct * 100);
-    }
 
-    function handleMouseLeave() {
-        x.set(0);
-        y.set(0);
-        setIsHovered(false);
-    }
-
-    return (
-        <motion.div
-            variants={fadeInUp}
-            whileHover={{ y: -5 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="h-full"
-            onHoverStart={() => setIsHovered(true)}
-            onHoverEnd={handleMouseLeave}
-            onMouseMove={handleMouseMove}
-            style={{
-                rotateX,
-                rotateY,
-                transformStyle: "preserve-3d",
-            }}
-        >
-            <Link
-                href={item.href || "#"}
-                className={`
-                    group relative flex flex-col gap-4 h-full rounded-xl p-5
-                    bg-gradient-to-b from-neutral-50/60 via-neutral-50/40 to-neutral-50/30 
-                    dark:from-neutral-900/60 dark:via-neutral-900/40 dark:to-neutral-900/30
-                    border border-neutral-200/60 dark:border-neutral-800/60
-                    before:absolute before:inset-0 before:rounded-xl
-                    before:bg-gradient-to-b before:from-white/10 before:via-white/20 before:to-transparent 
-                    dark:before:from-black/10 dark:before:via-black/20 dark:before:to-transparent
-                    before:opacity-100 before:transition-opacity before:duration-500
-                    after:absolute after:inset-0 after:rounded-xl after:bg-neutral-50/70 dark:after:bg-neutral-900/70 after:z-[-1]
-                    backdrop-blur-[4px]
-                    shadow-[0_4px_20px_rgb(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgb(0,0,0,0.2)]
-                    hover:border-neutral-300/50 dark:hover:border-neutral-700/50
-                    hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:hover:shadow-[0_8px_30px_rgb(0,0,0,0.3)]
-                    hover:backdrop-blur-[6px]
-                    hover:bg-gradient-to-b hover:from-neutral-50/60 hover:via-neutral-50/30 hover:to-neutral-50/20
-                    dark:hover:from-neutral-800/60 dark:hover:via-neutral-800/30 dark:hover:to-neutral-800/20
-                    transition-all duration-500 ease-out ${item.className}
-                `}
-                tabIndex={0}
-                aria-label={`${item.title} - ${item.description}`}
-            >
-                <div
-                    className="relative z-10 flex flex-col gap-3 h-full"
-                    style={{ transform: "translateZ(20px)" }}
-                >
-                    <div className="space-y-2 flex-1 flex flex-col">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100 group-hover:text-neutral-700 dark:group-hover:text-neutral-300 transition-colors duration-300">
-                                {item.title}
-                            </h3>
-                            <div className="text-neutral-400 dark:text-neutral-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                                <ArrowUpRight className="h-5 w-5" />
-                            </div>
-                        </div>
-
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400 tracking-tight">
-                            {item.description}
-                        </p>
-
-                        {/* Feature specific content */}
-                        {item.feature === "spotlight" &&
-                            item.spotlightItems && (
-                                <SpotlightFeature items={item.spotlightItems} />
-                            )}
-
-                        {item.feature === "counter" && item.statistic && (
-                            <div className="mt-auto pt-3">
-                                <CounterAnimation
-                                    start={item.statistic.start || 0}
-                                    end={item.statistic.end || 100}
-                                    suffix={item.statistic.suffix}
-                                />
-                            </div>
-                        )}
-
-                        {item.feature === "chart" && item.statistic && (
-                            <div className="mt-auto pt-3">
-                                <div className="flex items-center justify-between mb-1">
-                                    <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                                        {item.statistic.label}
-                                    </span>
-                                    <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                                        {item.statistic.end}
-                                        {item.statistic.suffix}
-                                    </span>
-                                </div>
-                                <ChartAnimation
-                                    value={item.statistic.end || 0}
-                                />
-                            </div>
-                        )}
-
-                        {item.feature === "timeline" && item.timeline && (
-                            <TimelineFeature timeline={item.timeline} />
-                        )}
-
-                        {item.feature === "icons" && <IconsFeature />}
-
-                        {item.feature === "typing" && item.typingText && (
-                            <TypingCodeFeature text={item.typingText} />
-                        )}
-
-                        {item.feature === "metrics" && item.metrics && (
-                            <MetricsFeature metrics={item.metrics} />
-                        )}
-
-                        {item.icons && !item.feature && (
-                            <div className="mt-auto pt-4 flex items-center flex-wrap gap-4 border-t border-neutral-200/70 dark:border-neutral-800/70">
-                                <OpenAI className="w-5 h-5 dark:hidden opacity-70 hover:opacity-100 transition-opacity" />
-                                <OpenAIDark className="w-5 h-5 hidden dark:block opacity-70 hover:opacity-100 transition-opacity" />
-                                <AnthropicDark className="w-5 h-5 dark:block hidden opacity-70 hover:opacity-100 transition-opacity" />
-                                <Anthropic className="w-5 h-5 dark:hidden opacity-70 hover:opacity-100 transition-opacity" />
-                                <Google className="w-5 h-5 opacity-70 hover:opacity-100 transition-opacity" />
-                                <MistralAI className="w-5 h-5 opacity-70 hover:opacity-100 transition-opacity" />
-                                <DeepSeek className="w-5 h-5 opacity-70 hover:opacity-100 transition-opacity" />
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </Link>
-        </motion.div>
-    );
-};
 
 export default function BentoGrid() {
     return (
-        <section className="relative py-24 sm:py-32 bg-white dark:bg-black overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Bento Grid */}
+        <section className="relative bg-white py-16 text-neutral-900 dark:bg-black dark:text-neutral-50 sm:py-24">
+            {/* Soft background glow */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.18),_transparent_70%)] dark:bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.28),_transparent_75%)]" />
+
+            <div className="relative mx-auto flex max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:px-8">
+                {/* Header row */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="space-y-2">
+                        <p className="inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.16em] text-neutral-500 dark:text-neutral-400">
+                            <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-neutral-900 text-[9px] text-neutral-50 dark:bg-neutral-100 dark:text-neutral-900">
+                                AI
+                            </span>
+                            Lumen Orchestration Layer
+                        </p>
+                        <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+                            One surface for models, agents, and voice-native
+                            workflows.
+                        </h1>
+                        <p className="max-w-xl text-sm text-neutral-600 dark:text-neutral-400">
+                            Ship production AI systems faster with unified
+                            routing, observability, and multi-provider
+                            orchestration—built for real teams, not demos.
+                        </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-neutral-500 dark:text-neutral-400">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-neutral-950 px-2 py-1 text-[10px] font-medium text-neutral-50 dark:bg-neutral-100 dark:text-neutral-900">
+                            <Sparkles className="h-3 w-3" />
+                            Multi-provider ready
+                        </span>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-neutral-200/70 px-2 py-1 dark:border-neutral-800/70">
+                            <Clock className="h-3 w-3" />
+                            <span>Avg integration time: &lt; 2 days</span>
+                        </span>
+                    </div>
+                </div>
+
+                {/* Grid */}
                 <motion.div
+                    variants={containerVariants}
                     initial="hidden"
                     whileInView="visible"
-                    viewport={{ once: true }}
-                    variants={staggerContainer}
-                    className="grid gap-6"
+                    viewport={{ once: true, amount: 0.3 }}
+                    className="grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]"
                 >
-                    <div className="grid md:grid-cols-3 gap-6">
+                    {/* Left column: Hero + providers */}
+                    <motion.div
+                        variants={cardVariants}
+                        className="flex flex-col gap-5"
+                    >
+                        {/* Primary “hero” card */}
                         <motion.div
-                            variants={fadeInUp}
-                            className="md:col-span-1"
+                            whileHover={{ y: -4 }}
+                            transition={{
+                                type: "spring",
+                                stiffness: 260,
+                                damping: 20,
+                            }}
+                            className="relative overflow-hidden rounded-2xl border border-neutral-200/70 bg-gradient-to-br from-neutral-50 via-neutral-50 to-neutral-100/60 p-5 shadow-[0_14px_40px_rgba(15,23,42,0.06)] dark:border-neutral-800/70 dark:bg-gradient-to-br dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-900 dark:shadow-[0_20px_60px_rgba(0,0,0,0.85)]"
                         >
-                            <BentoCard item={bentoItems[0]} />
-                        </motion.div>
-                        <motion.div
-                            variants={fadeInUp}
-                            className="md:col-span-2"
-                        >
-                            <BentoCard item={bentoItems[1]} />
-                        </motion.div>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <motion.div
-                            variants={fadeInUp}
-                            className="md:col-span-1"
-                        >
-                            <BentoCard item={bentoItems[2]} />
-                        </motion.div>
-                        <motion.div
-                            variants={fadeInUp}
-                            className="md:col-span-1 rounded-xl overflow-hidden bg-gradient-to-b from-neutral-50/80 to-neutral-50 dark:from-neutral-900/80 dark:to-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 hover:border-neutral-400/30 dark:hover:border-neutral-600/30 hover:shadow-lg hover:shadow-neutral-200/20 dark:hover:shadow-neutral-900/20 transition-all duration-300"
-                        >
-                            <div className="p-5">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                                        Voice Assistant
-                                    </h3>
+                            <div className="pointer-events-none absolute -right-10 top-[-40px] h-40 w-40 rounded-full bg-[conic-gradient(from_180deg,_rgba(94,234,212,0.1)_0deg,_transparent_120deg,_rgba(56,189,248,0.16)_240deg,_transparent_360deg)] blur-2xl" />
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between gap-3">
+                                    <div>
+                                        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
+                                            Control plane
+                                        </p>
+                                        <h2 className="mt-1 text-lg font-semibold tracking-tight">
+                                            Route any request to the best
+                                            model, safely.
+                                        </h2>
+                                    </div>
+                                    <Link
+                                        href="#"
+                                        className="inline-flex items-center gap-1 rounded-full bg-neutral-900 px-3 py-1.5 text-[11px] font-medium text-neutral-50 shadow-sm transition hover:bg-neutral-800 dark:bg-neutral-50 dark:text-neutral-900 dark:hover:bg-neutral-200"
+                                    >
+                                        View playbook
+                                        <ArrowUpRight className="h-3.5 w-3.5" />
+                                    </Link>
                                 </div>
-                                <p className="text-sm text-neutral-600 dark:text-neutral-400 tracking-tight mb-4">
-                                    Interact with our AI using natural voice
-                                    commands. Experience seamless voice-driven
-                                    interactions with advanced speech
-                                    recognition.
+                                <p className="max-w-xl text-xs text-neutral-600 dark:text-neutral-400">
+                                    Define routing rules once, experiment with
+                                    providers freely, and keep latency,
+                                    quality, and cost in a single pane of
+                                    glass.
                                 </p>
-                                <AIInput_Voice />
+                                <div className="mt-3 grid gap-3 text-xs sm:grid-cols-3">
+                                    <div className="space-y-1.5 rounded-xl border border-neutral-200/70 bg-white/70 px-3 py-2.5 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900/80">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                                                Median latency
+                                            </span>
+                                            <Zap className="h-3 w-3 text-emerald-500" />
+                                        </div>
+                                        <div className="mt-1 text-sm font-semibold">
+                                            542 ms
+                                        </div>
+                                        <div className="mt-0.5 text-[10px] text-neutral-400">
+                                            &lt; 1s for 94% requests
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1.5 rounded-xl border border-neutral-200/70 bg-white/70 px-3 py-2.5 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900/80">
+                                        <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                                            Success rate (last 24h)
+                                        </span>
+                                        <div className="mt-1 flex items-baseline gap-1">
+                                            <span className="text-sm font-semibold">
+                                                99.7%
+                                            </span>
+                                            <span className="text-[10px] text-emerald-500">
+                                                +0.6%
+                                            </span>
+                                        </div>
+                                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-neutral-200/80 dark:bg-neutral-800">
+                                            <div className="h-full w-[96%] rounded-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-400" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1.5 rounded-xl border border-neutral-200/70 bg-white/70 px-3 py-2.5 shadow-sm dark:border-neutral-800/70 dark:bg-neutral-900/80">
+                                        <span className="text-[11px] text-neutral-500 dark:text-neutral-400">
+                                            Cost savings
+                                        </span>
+                                        <div className="mt-1 text-sm font-semibold">
+                                            38%
+                                        </div>
+                                        <div className="mt-0.5 text-[10px] text-neutral-400">
+                                            vs single-provider baseline
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </motion.div>
-                    </div>
+
+                        {/* Providers card */}
+                        <motion.div
+                            variants={cardVariants}
+                            whileHover={{ y: -3 }}
+                            className="rounded-2xl border border-neutral-200/70 bg-white/80 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.04)] backdrop-blur-sm dark:border-neutral-800/70 dark:bg-neutral-950/80 dark:shadow-[0_14px_40px_rgba(0,0,0,0.8)]"
+                        >
+                            <div className="mb-3 flex items-center justify-between gap-2 text-xs">
+                                <div>
+                                    <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
+                                        Connected providers
+                                    </p>
+                                    <p className="mt-1 text-[11px] text-neutral-600 dark:text-neutral-400">
+                                        Mix and match foundation and
+                                        open-source models.
+                                    </p>
+                                </div>
+                                <span className="rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-medium text-neutral-600 dark:bg-neutral-900 dark:text-neutral-300">
+                                    5 active · 2 pending
+                                </span>
+                            </div>
+                            <ProvidersRow />
+                        </motion.div>
+                    </motion.div>
+
+                    {/* Right column: metrics + voice + activity */}
+                    <motion.div
+                        variants={cardVariants}
+                        className="grid gap-5 md:grid-cols-2 lg:grid-cols-1"
+                    >
+                        {/* Metrics card */}
+                        <motion.div
+                            whileHover={{ y: -3 }}
+                            className="rounded-2xl border border-neutral-200/70 bg-neutral-50/90 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.04)] backdrop-blur-sm dark:border-neutral-800/70 dark:bg-neutral-950/80 dark:shadow-[0_14px_40px_rgba(0,0,0,0.8)]"
+                        >
+                            <div className="flex items-center justify-between text-xs">
+                                <div>
+                                    <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
+                                        Reliability
+                                    </p>
+                                    <p className="mt-1 text-[11px] text-neutral-600 dark:text-neutral-400">
+                                        Real-time health across all providers.
+                                    </p>
+                                </div>
+                                <span className="rounded-full bg-neutral-900 px-2 py-1 text-[10px] font-medium text-neutral-50 dark:bg-neutral-100 dark:text-neutral-900">
+                                    SLO · 99.9%
+                                </span>
+                            </div>
+
+                            <div className="mt-4 space-y-2.5">
+                                <MetricRow
+                                    label="Global uptime (30d)"
+                                    value="99.96"
+                                    suffix="%"
+                                    accent="green"
+                                />
+                                <MetricRow
+                                    label="Median p95 latency"
+                                    value="1.21"
+                                    suffix="s"
+                                    accent="blue"
+                                />
+                                <MetricRow
+                                    label="Token usage optimized"
+                                    value="42"
+                                    suffix="%"
+                                    accent="amber"
+                                />
+                            </div>
+
+                            <div className="mt-4 h-16 rounded-xl bg-gradient-to-r from-emerald-500/10 via-sky-500/10 to-violet-500/10 p-[1px]">
+                                <div className="flex h-full items-center justify-between rounded-[10px] bg-white/80 px-3 text-[10px] text-neutral-500 shadow-sm dark:bg-neutral-950/90 dark:text-neutral-400">
+                                    <span className="max-w-[60%]">
+                                        Auto-rerouting kicks in when any region
+                                        breaches latency or failure thresholds.
+                                    </span>
+                                    <span className="rounded-full border border-neutral-200/70 bg-neutral-50 px-2 py-1 font-medium dark:border-neutral-800/70 dark:bg-neutral-900">
+                                        Safe by design
+                                    </span>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        {/* Voice + Activity stacked */}
+                        <div className="flex flex-col gap-5">
+                            <motion.div
+                                whileHover={{ y: -3 }}
+                                className="rounded-2xl border border-neutral-200/70 bg-white/80 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.04)] backdrop-blur-sm dark:border-neutral-800/70 dark:bg-neutral-950/85 dark:shadow-[0_14px_40px_rgba(0,0,0,0.8)]"
+                            >
+                                <VoiceWidget />
+                            </motion.div>
+
+                            <motion.div
+                                whileHover={{ y: -3 }}
+                                className="rounded-2xl border border-neutral-200/70 bg-neutral-50/90 p-5 shadow-[0_10px_30px_rgba(15,23,42,0.04)] backdrop-blur-sm dark:border-neutral-800/70 dark:bg-neutral-950/80 dark:shadow-[0_14px_40px_rgba(0,0,0,0.8)]"
+                            >
+                                <div className="flex items-center justify-between text-xs">
+                                    <div>
+                                        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-500 dark:text-neutral-400">
+                                            Latest activity
+                                        </p>
+                                        <p className="mt-1 text-[11px] text-neutral-600 dark:text-neutral-400">
+                                            Everything your agents and tools are
+                                            doing, in one stream.
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="rounded-full border border-neutral-200/70 bg-white px-2 py-1 text-[10px] font-medium text-neutral-600 shadow-sm transition hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                                    >
+                                        View logs
+                                    </button>
+                                </div>
+                                <ActivityList />
+                            </motion.div>
+                        </div>
+                    </motion.div>
                 </motion.div>
             </div>
         </section>

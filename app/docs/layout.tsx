@@ -7,9 +7,9 @@ import { ComponentSearch } from "@/components/docs/component-search";
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
     return (
-        <SidebarProvider>
+        <SidebarProvider suppressHydrationWarning>
             <AppSidebar />
-            <SidebarInset>
+            <SidebarInset suppressHydrationWarning>
                 <div className="flex h-screen flex-col bg-white dark:bg-black">
                     <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b px-4 bg-white dark:bg-black">
                         <div className="flex items-center gap-2">

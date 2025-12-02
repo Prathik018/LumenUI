@@ -1,264 +1,146 @@
 "use client";
 
-import { useRef } from "react";
+import React, { FC, useState, CSSProperties } from "react";
 import { motion } from "motion/react";
-import { cn } from "@/lib/utils";
 
-interface GlitchTextProps {
-    text: string;
-    className?: string;
-    glitchIntensity?: "light" | "medium" | "heavy" | "extreme";
-    color?:
-        | "rainbow"
-        | "blue"
-        | "purple"
-        | "cyan"
-        | "pink"
-        | "orange"
-        | "gradient-orange";
-    backgroundColor?: string;
-    isStatic?: boolean;
-    size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | number;
-    fontWeight?: number;
-    letterSpacing?: number;
+interface GlitchMotionTextProps {
+  text?: string;
+  speed?: number;
+  enableShadows?: boolean;
+  enableOnHover?: boolean;
+  className?: string;
+  children?: string;
 }
 
-const GlitchText = ({
-    text = "Glitch Text",
-    className,
-    glitchIntensity = "medium",
-    color = "gradient-orange",
-    backgroundColor,
-    isStatic = false,
-    size = "md",
-    fontWeight = 700,
-    letterSpacing = 5,
-}: GlitchTextProps) => {
-    const containerRef = useRef<HTMLDivElement>(null);
+const GlitchMotionText: FC<GlitchMotionTextProps> = ({
+  text = "Glitch Text",
+  children,
+  speed = 0.5,
+  enableShadows = true,
+  enableOnHover = false,
+  className = "",
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
 
-    // Vibrant color schemes
-    const colorSchemes = {
-        rainbow: {
-            primary: "oklch(0.85 0.2 var(--rainbow-hue, 270))",
-            before: "oklch(0.9 0.15 calc(var(--rainbow-hue, 270) + 60))",
-            after: "oklch(0.8 0.25 calc(var(--rainbow-hue, 270) - 60))",
-        },
-        blue: {
-            primary: "oklch(0.65 0.2 250)", // Vibrant blue
-            before: "oklch(0.75 0.15 255)", // Lighter blue
-            after: "oklch(0.55 0.25 245)", // Deeper blue
-        },
-        purple: {
-            primary: "oklch(0.6 0.22 290)", // Rich purple
-            before: "oklch(0.7 0.18 295)", // Lighter purple
-            after: "oklch(0.5 0.25 285)", // Deep purple
-        },
-        cyan: {
-            primary: "oklch(0.8 0.15 200)", // Bright cyan
-            before: "oklch(0.85 0.12 205)", // Light cyan
-            after: "oklch(0.7 0.18 195)", // Deep cyan
-        },
-        pink: {
-            primary: "oklch(0.7 0.25 330)", // Vibrant pink
-            before: "oklch(0.8 0.2 335)", // Light pink
-            after: "oklch(0.6 0.28 325)", // Deep pink
-        },
-        orange: {
-            primary: "oklch(0.7 0.25 45)", // Vibrant tangerine orange
-            before: "oklch(0.85 0.2 40)", // Warm light orange
-            after: "oklch(0.6 0.28 50)", // Deep sunset orange
-        },
-        "gradient-orange": {
-            primary:
-                "linear-gradient(135deg, oklch(0.7 0.25 45) 0%, oklch(0.75 0.28 30) 50%, oklch(0.65 0.3 60) 100%)",
-            before: "linear-gradient(135deg, oklch(0.85 0.2 40) 0%, oklch(0.8 0.22 25) 50%, oklch(0.75 0.25 55) 100%)",
-            after: "linear-gradient(135deg, oklch(0.6 0.28 50) 0%, oklch(0.55 0.3 35) 50%, oklch(0.5 0.32 65) 100%)",
-        },
-    };
+  const active = enableOnHover ? isHovered : true;
 
-    const selectedScheme = colorSchemes[color];
+  const displayText = children ?? text;
 
-    // Glitch intensity settings
-    const intensitySettings = {
-        light: {
-            animationDuration: "2s",
-            translateRange: 2,
-            opacityRange: [0.8, 0.9],
-            skewRange: 0.5,
-        },
-        medium: {
-            animationDuration: "1s",
-            translateRange: 3,
-            opacityRange: [0.7, 0.85],
-            skewRange: 1,
-        },
-        heavy: {
-            animationDuration: "0.5s",
-            translateRange: 5,
-            opacityRange: [0.6, 0.8],
-            skewRange: 2,
-        },
-        extreme: {
-            animationDuration: "0.3s",
-            translateRange: 8,
-            opacityRange: [0.5, 0.75],
-            skewRange: 3,
-        },
-    };
+  const baseClass =
+    "relative inline-block select-none cursor-pointer font-black text-[clamp(2rem,10vw,8rem)] tracking-widest text-foreground";
 
-    const settings = intensitySettings[glitchIntensity];
+  const sharedOverlayStyle: CSSProperties = {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    mixBlendMode: "screen",
+  };
 
-    const sizeMap = {
-        sm: "text-2xl",
-        md: "text-4xl",
-        lg: "text-5xl",
-        xl: "text-6xl",
-        "2xl": "text-7xl",
-        "3xl": "text-8xl",
-    };
+  const redStyle: CSSProperties = {
+    ...sharedOverlayStyle,
+    textShadow: enableShadows ? "-3px 0 #ff005c" : "none",
+  };
 
-    // Animation variants for the glitch effect
-    const glitchAnimation = {
-        initial: {
-            transform: "translate(0)",
-            opacity: settings.opacityRange[1],
-        },
-        animate: {
-            transform: [
-                "translate(0)",
-                `translate(${
-                    settings.translateRange
-                }px, ${-settings.translateRange}px) skew(${
-                    settings.skewRange
-                }deg)`,
-                `translate(${-settings.translateRange}px, ${
-                    settings.translateRange
-                }px) skew(${-settings.skewRange}deg)`,
-                `translate(${-settings.translateRange}px, ${-settings.translateRange}px) skew(${
-                    settings.skewRange
-                }deg)`,
-                `translate(${settings.translateRange}px, ${
-                    settings.translateRange
-                }px) skew(${-settings.skewRange}deg)`,
-                "translate(0)",
-            ],
-            opacity: [
-                settings.opacityRange[1],
-                settings.opacityRange[0],
-                settings.opacityRange[1],
-                settings.opacityRange[0],
-                settings.opacityRange[1],
-            ],
-            transition: {
-                duration: Number(settings.animationDuration.replace("s", "")),
-                ease: [0.25, 0.46, 0.45, 0.94],
-                repeat: Number.POSITIVE_INFINITY,
-            },
-        },
-    };
+  const cyanStyle: CSSProperties = {
+    ...sharedOverlayStyle,
+    textShadow: enableShadows ? "3px 0 #00f6ff" : "none",
+  };
 
-    return (
-        <div
-            ref={containerRef}
-            className={cn(
-                "relative flex items-center justify-center",
-                "overflow-visible p-8",
-                className
-            )}
-        >
-            <motion.div
-                className={cn(
-                    "relative font-bold tracking-wider",
-                    typeof size === "string" ? sizeMap[size] : ""
-                )}
-                style={{
-                    fontSize:
-                        typeof size === "number" ? `${size}px` : undefined,
-                    fontWeight,
-                    letterSpacing,
-                    color: selectedScheme.primary,
-                    textShadow: `0 0 5px ${selectedScheme.primary}40`,
-                }}
-                initial="initial"
-                animate={!isStatic ? "animate" : "initial"}
-                variants={glitchAnimation as any}
-            >
-                {text}
+  return (
+    <div
+      className={`${baseClass} ${className}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <span>{displayText}</span>
 
-                <motion.div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                        color: selectedScheme.before,
-                        textShadow: `0 0 7px ${selectedScheme.before}40`,
-                    }}
-                    initial="initial"
-                    animate={!isStatic ? "animate" : "initial"}
-                    variants={{
-                        ...glitchAnimation as any,
-                        animate: {
-                            ...(glitchAnimation as any).animate,
-                            transform: [
-                                "translate(0)",
-                                `translate(${-settings.translateRange}px, ${
-                                    settings.translateRange
-                                }px) skew(${-settings.skewRange}deg)`,
-                                `translate(${
-                                    settings.translateRange
-                                }px, ${-settings.translateRange}px) skew(${
-                                    settings.skewRange
-                                }deg)`,
-                                `translate(${settings.translateRange}px, ${
-                                    settings.translateRange
-                                }px) skew(${-settings.skewRange}deg)`,
-                                `translate(${-settings.translateRange}px, ${-settings.translateRange}px) skew(${
-                                    settings.skewRange
-                                }deg)`,
-                                "translate(0)",
-                            ],
-                        },
-                    }}
-                >
-                    {text}
-                </motion.div>
+      <motion.span
+        style={redStyle}
+        initial={{
+          x: 0,
+          y: 0,
+          skewX: "0deg",
+          clipPath: "inset(0 0 100% 0)",
+          opacity: 0,
+        }}
+        animate={
+          active
+            ? {
+                x: [0, -2, 3, -4, 1, 0],
+                y: [0, -1, 2, -3, 1, 0],
+                skewX: ["0deg", "4deg", "-5deg", "3deg", "-2deg", "0deg"],
+                clipPath: [
+                  "inset(0 0 80% 0)",
+                  "inset(10% 0 60% 0)",
+                  "inset(40% 0 30% 0)",
+                  "inset(60% 0 10% 0)",
+                  "inset(20% 0 50% 0)",
+                  "inset(0 0 80% 0)",
+                ],
+                opacity: [0.8, 1, 0.6, 1, 0.7, 0.9],
+              }
+            : {
+                x: 0,
+                y: 0,
+                skewX: "0deg",
+                clipPath: "inset(0 0 100% 0)",
+                opacity: 0,
+              }
+        }
+        transition={{
+          duration: speed * 2,
+          repeat: active ? Infinity : 0,
+          repeatType: "mirror",
+        }}
+      >
+        {displayText}
+      </motion.span>
 
-                <motion.div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                        color: selectedScheme.after,
-                        textShadow: `0 0 7px ${selectedScheme.after}40`,
-                    }}
-                    initial="initial"
-                    animate={!isStatic ? "animate" : "initial"}
-                    variants={{
-                        ...(glitchAnimation as any),
-                        animate: {
-                            ...(glitchAnimation as any).animate,
-                            transform: [
-                                "translate(0)",
-                                `translate(${
-                                    settings.translateRange
-                                }px, ${-settings.translateRange}px) skew(${
-                                    settings.skewRange
-                                }deg)`,
-                                `translate(${-settings.translateRange}px, ${
-                                    settings.translateRange
-                                }px) skew(${-settings.skewRange}deg)`,
-                                `translate(${-settings.translateRange}px, ${
-                                    settings.translateRange
-                                }px) skew(${settings.skewRange}deg)`,
-                                `translate(${
-                                    settings.translateRange
-                                }px, ${-settings.translateRange}px) skew(${-settings.skewRange}deg)`,
-                                "translate(0)",
-                            ],
-                        },
-                    }}
-                >
-                    {text}
-                </motion.div>
-            </motion.div>
-        </div>
-    );
+      <motion.span
+        style={cyanStyle}
+        initial={{
+          x: 0,
+          y: 0,
+          skewX: "0deg",
+          clipPath: "inset(100% 0 0 0)",
+          opacity: 0,
+        }}
+        animate={
+          active
+            ? {
+                x: [0, 3, -2, 4, -1, 0],
+                y: [0, 2, -3, 1, -1, 0],
+                skewX: ["0deg", "-4deg", "5deg", "-3deg", "2deg", "0deg"],
+                clipPath: [
+                  "inset(70% 0 0 0)",
+                  "inset(50% 0 10% 0)",
+                  "inset(25% 0 40% 0)",
+                  "inset(5% 0 65% 0)",
+                  "inset(30% 0 25% 0)",
+                  "inset(70% 0 0 0)",
+                ],
+                opacity: [0.7, 1, 0.5, 1, 0.8, 0.9],
+              }
+            : {
+                x: 0,
+                y: 0,
+                skewX: "0deg",
+                clipPath: "inset(100% 0 0 0)",
+                opacity: 0,
+              }
+        }
+        transition={{
+          duration: speed * 3,
+          repeat: active ? Infinity : 0,
+          repeatType: "mirror",
+        }}
+      >
+        {displayText}
+      </motion.span>
+    </div>
+  );
 };
 
-export default GlitchText;
+export default GlitchMotionText;

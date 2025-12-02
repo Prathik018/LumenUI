@@ -1,6 +1,5 @@
 "use client";
 
-
 import * as React from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -30,7 +29,7 @@ interface ToolbarItem {
 
 interface ToolbarProps {
     className?: string;
-    activeColor?: string;
+    activeColor?: string; // Tailwind text/color class or custom
     onSearch?: (value: string) => void;
 }
 
@@ -41,9 +40,9 @@ const buttonVariants = {
         paddingRight: ".5rem",
     },
     animate: (isSelected: boolean) => ({
-        gap: isSelected ? ".5rem" : 0,
-        paddingLeft: isSelected ? "1rem" : ".5rem",
-        paddingRight: isSelected ? "1rem" : ".5rem",
+        gap: isSelected ? 6 : 0,
+        paddingLeft: isSelected ? "0.9rem" : ".5rem",
+        paddingRight: isSelected ? "0.9rem" : ".5rem",
     }),
 };
 
@@ -55,8 +54,8 @@ const spanVariants = {
 
 const notificationVariants = {
     initial: { opacity: 0, y: 10 },
-    animate: { opacity: 1, y: -10 },
-    exit: { opacity: 0, y: -20 },
+    animate: { opacity: 1, y: -6 },
+    exit: { opacity: 0, y: -18 },
 };
 
 const lineVariants = {
@@ -73,11 +72,11 @@ const lineVariants = {
     },
 };
 
-const transition = { type: "spring", bounce: 0, duration: 0.4 };
+const transition = { type: "spring", bounce: 0, duration: 0.35 };
 
 export function Toolbar({
     className,
-    activeColor = "text-primary",
+    activeColor = "text-[#1F9CFE]",
     onSearch,
 }: ToolbarProps) {
     const [selected, setSelected] = React.useState<string | null>("select");
@@ -85,7 +84,7 @@ export function Toolbar({
     const [activeNotification, setActiveNotification] = React.useState<
         string | null
     >(null);
-    const outsideClickRef = React.useRef(null);
+    const [searchValue, setSearchValue] = React.useState("");
 
     const toolbarItems: ToolbarItem[] = [
         { id: "select", title: "Select", icon: MousePointer2 },
@@ -104,124 +103,163 @@ export function Toolbar({
     const handleItemClick = (itemId: string) => {
         setSelected(selected === itemId ? null : itemId);
         setActiveNotification(itemId);
-        setTimeout(() => setActiveNotification(null), 1500);
+        const timeout = setTimeout(() => setActiveNotification(null), 1400);
+        return () => clearTimeout(timeout);
     };
 
+    const handleSearchChange = (value: string) => {
+        setSearchValue(value);
+        onSearch?.(value);
+    };
+
+    const selectedItemTitle =
+        activeNotification &&
+        toolbarItems.find((item) => item.id === activeNotification)?.title;
+
+    const activeColorClasses = cn(activeColor); // tailwind class passthrough
+
     return (
-        <div className="space-y-2">
+        <div className={cn("space-y-2", className)}>
             <div
-                ref={outsideClickRef}
                 className={cn(
-                    "flex items-center gap-3 p-2 relative",
-                    "bg-background",
-                    "border rounded-xl",
-                    "transition-all duration-200",
-                    className
+                    "relative flex items-center justify-between gap-3 px-3 py-2",
+                    "rounded-2xl border bg-background/80 shadow-sm backdrop-blur-xl",
+                    "dark:border-border/60"
                 )}
             >
+                {/* Floating notification */}
                 <AnimatePresence>
-                    {activeNotification && (
+                    {activeNotification && selectedItemTitle && (
                         <motion.div
                             variants={notificationVariants as any}
                             initial="initial"
                             animate="animate"
                             exit="exit"
-                            transition={{ duration: 0.3 }}
-                            className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-50"
+                            transition={{ duration: 0.25 }}
+                            className="absolute -top-7 left-1/2 z-40 -translate-x-1/2"
                         >
-                            <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs">
-                                {
-                                    toolbarItems.find(
-                                        (item) => item.id === activeNotification
-                                    )?.title
-                                }{" "}
-                                clicked!
+                            <div className="relative rounded-full bg-foreground text-background px-3 py-1 text-[11px] font-medium shadow-md">
+                                {selectedItemTitle} clicked!
+                                <motion.div
+                                    variants={lineVariants as any}
+                                    initial="initial"
+                                    animate="animate"
+                                    exit="exit"
+                                    className="absolute -bottom-1 left-1/2 h-[2px] w-full origin-left bg-foreground/80"
+                                />
                             </div>
-                            <motion.div
-                                variants={lineVariants as any}
-                                initial="initial"
-                                animate="animate"
-                                exit="exit"
-                                className="absolute -bottom-1 left-1/2 w-full h-[2px] bg-primary origin-left"
-                            />
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                <div className="flex items-center gap-2">
-                    {toolbarItems.map((item) => (
-                        <motion.button
-                            key={item.id}
-                            variants={buttonVariants as any}
-                            initial={false}
-                            animate="animate"
-                            custom={selected === item.id}
-                            onClick={() => handleItemClick(item.id)}
-                            transition={transition as any}
-                            className={cn(
-                                "relative flex items-center rounded-none px-3 py-2",
-                                "text-sm font-medium transition-colors duration-300",
-                                selected === item.id
-                                    ? "bg-[#1F9CFE] text-white rounded-lg"
-                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                            )}
-                        >
-                            <item.icon
-                                size={16}
-                                className={cn(
-                                    selected === item.id && "text-white"
-                                )}
-                            />
-                            <AnimatePresence initial={false}>
-                                {selected === item.id && (
-                                    <motion.span
-                                        variants={spanVariants as any}
-                                        initial="initial"
-                                        animate="animate"
-                                        exit="exit"
-                                        transition={transition as any}
-                                        className="overflow-hidden"
-                                    >
-                                        {item.title}
-                                    </motion.span>
-                                )}
-                            </AnimatePresence>
-                        </motion.button>
-                    ))}
+                {/* LEFT: Tool buttons */}
+                <div className="flex flex-1 items-center gap-1 overflow-x-auto scrollbar-none">
+                    <div className="inline-flex items-center gap-1 rounded-xl border border-border/70 bg-background/80 px-1 py-1 shadow-xs backdrop-blur">
+                        {toolbarItems.map((item) => {
+                            const isSelected = selected === item.id;
+                            const Icon = item.icon;
 
+                            return (
+                                <motion.button
+                                    key={item.id}
+                                    type="button"
+                                    variants={buttonVariants as any}
+                                    initial="initial"
+                                    animate="animate"
+                                    custom={isSelected}
+                                    transition={transition as any}
+                                    onClick={() => handleItemClick(item.id)}
+                                    className={cn(
+                                        "relative inline-flex items-center rounded-lg text-xs font-medium",
+                                        "h-8 select-none whitespace-nowrap",
+                                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0",
+                                        isSelected
+                                            ? [
+                                                  "bg-foreground text-background shadow-sm",
+                                                  "px-4",
+                                              ]
+                                            : [
+                                                  "bg-transparent text-muted-foreground",
+                                                  "hover:bg-muted hover:text-foreground",
+                                                  "px-2.5",
+                                              ]
+                                    )}
+                                    aria-pressed={isSelected}
+                                >
+                                    <Icon
+                                        size={16}
+                                        className={cn(
+                                            "shrink-0",
+                                            isSelected
+                                                ? "text-background"
+                                                : activeColorClasses
+                                        )}
+                                    />
+                                    <AnimatePresence initial={false}>
+                                        {isSelected && (
+                                            <motion.span
+                                                variants={spanVariants as any}
+                                                initial="initial"
+                                                animate="animate"
+                                                exit="exit"
+                                                transition={transition as any}
+                                                className="overflow-hidden"
+                                            >
+                                                <span className="ml-1.5">
+                                                    {item.title}
+                                                </span>
+                                            </motion.span>
+                                        )}
+                                    </AnimatePresence>
+                                </motion.button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* RIGHT: Mode toggle + search */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                    {/* Toggle */}
                     <motion.button
                         whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => setIsToggled(!isToggled)}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => setIsToggled((prev) => !prev)}
+                        type="button"
                         className={cn(
-                            "flex items-center gap-2 px-4 py-2",
-                            "rounded-xl border shadow-sm transition-all duration-200",
-                            "hover:shadow-md active:border-primary/50",
+                            "inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium",
+                            "transition-all duration-200 shadow-xs",
                             isToggled
                                 ? [
-                                      "bg-[#1F9CFE] text-white",
-                                      "border-[#1F9CFE]/30",
-                                      "hover:bg-[#1F9CFE]/90",
-                                      "hover:border-[#1F9CFE]/40",
+                                      "bg-foreground text-background",
+                                      "border-foreground/80",
                                   ]
                                 : [
                                       "bg-background text-muted-foreground",
-                                      "border-border/30",
-                                      "hover:bg-muted",
-                                      "hover:text-foreground",
-                                      "hover:border-border/40",
+                                      "border-border/60",
+                                      "hover:bg-muted hover:text-foreground",
                                   ]
                         )}
                     >
                         {isToggled ? (
-                            <Edit2 className="w-3.5 h-3.5" />
+                            <Edit2 className="h-3.5 w-3.5" />
                         ) : (
-                            <Lock className="w-3.5 h-3.5" />
+                            <Lock className="h-3.5 w-3.5" />
                         )}
-                        <span className="text-sm font-medium">
-                            {isToggled ? "On" : "Off"}
-                        </span>
+                        <span>{isToggled ? "Editing" : "Locked"}</span>
                     </motion.button>
+
+                    {/* Search (optional usage via onSearch) */}
+                    <div className="hidden sm:flex h-8 items-center rounded-xl border border-border/60 bg-muted/60 px-2 text-xs text-muted-foreground focus-within:border-foreground/50 focus-within:bg-background/80 focus-within:text-foreground transition-all duration-150">
+                        <input
+                            type="text"
+                            value={searchValue}
+                            onChange={(e) =>
+                                handleSearchChange(e.target.value)
+                            }
+                            placeholder="Search tools"
+                            className="h-full w-[120px] bg-transparent text-[11px] outline-none placeholder:text-muted-foreground/70"
+                        />
+                    </div>
                 </div>
             </div>
         </div>

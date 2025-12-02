@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import PreviewContent from "./preview-content";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
 type PreviewProps = {
     children: React.ReactNode;
@@ -27,14 +27,22 @@ export function Preview({
     comment = [],
     isBlock = false,
 }: PreviewProps) {
+    const [refreshKey, setRefreshKey] = useState(0);
+
     return (
         <div className={cn("w-full overflow-hidden", className)}>
-            <PreviewContent isBlock={isBlock} link={link} prePath={PRE_PATH} />
+            <PreviewContent
+                isBlock={isBlock}
+                link={link}
+                prePath={PRE_PATH}
+                onRefresh={() => setRefreshKey((prev: number) => prev + 1)}
+            />
 
             {useIframe ? (
                 <div className="my-4 w-full rounded-md border border-zinc-400 dark:border-zinc-700">
                     <div className="relative h-[100dvh] w-full overflow-hidden">
                         <iframe
+                            key={refreshKey}
                             className="h-full w-full list-none overflow-y-auto"
                             src={`${PRE_PATH}/preview/${link}`}
                             style={{
@@ -58,7 +66,9 @@ export function Preview({
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100"></div>
                         </div>
                     }>
-                        {children}
+                        <div key={refreshKey} className="w-full h-full flex items-center justify-center">
+                            {children}
+                        </div>
                     </Suspense>
                 </div>
             )}

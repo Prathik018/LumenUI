@@ -4,18 +4,16 @@ import { motion } from "motion/react";
 import SlideTextButton from "@/components/lumenui/slide-text-button";
 import FeatureBlock from "@/components/landing/FeatureBlock";
 import CardFlip from "@/components/lumenui/card-flip";
-import GradientButton from "@/components/lumenui/gradient-button";
-import AttractButton from "@/components/lumenui/attract-button";
-import AI_Prompt from "@/components/lumenui/ai-prompt";
+import ActivityCard from "@/components/lumenui/activity-card";
 import FileUpload from "@/components/lumenui/file-upload";
 import AILoadingState from "@/components/lumenui/ai-loading";
+import AIVoice from "@/components/lumenui/ai-voice";
 
 export function HeroSection() {
   return (
-    <div className="container relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col items-center justify-between gap-8 px-4 py-8 md:py-12 lg:flex-row lg:gap-4">
-
+    <div className="container relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col items-center justify-between gap-8 px-4 py-8 md:py-12 lg:flex-row lg:items-start lg:gap-4">
       {/* Left side - Title and CTA */}
-      <div className="flex w-full flex-col items-start space-y-8 text-left md:mb-42 lg:w-[45%]">
+      <div className="flex w-full flex-col items-start space-y-6 text-left lg:mt-16 lg:w-[45%]">
         <div>
           <h1 className="font-semibold font-montserrat text-5xl text-black leading-[1.1] tracking-tight sm:text-6xl lg:text-6xl dark:text-white">
             Build faster with stunning UI components
@@ -26,19 +24,22 @@ export function HeroSection() {
             shadcn/ui, and Motion refined into the lightweight, accessible LumenUI library.
           </p>
         </div>
+
         <div className="flex w-full flex-col justify-center sm:justify-start">
           <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:items-start sm:justify-start">
-            <SlideTextButton hoverText="Click to see more" href="/docs/components/action-search-bar" />
+            <SlideTextButton
+              hoverText="Click to see more"
+              href="/docs/components/action-search-bar"
+            />
           </div>
-
         </div>
+
+        {/* FeatureBlock stays here; layout is controlled inside the component */}
         <FeatureBlock />
-        <div className="mt-8 w-full space-y-2"> </div>
       </div>
 
       {/* Right side - Dynamic Component Preview Grid */}
       <div className="flex w-full flex-col justify-between gap-2 lg:w-[55%] lg:pl-8">
-
         {/* Top Row - Bento Grid Style */}
         <motion.div
           animate={{ opacity: 1, y: 0 }}
@@ -59,7 +60,7 @@ export function HeroSection() {
               rotateY: 0,
               x: 0,
               scale: 1.03,
-              transition: { duration: 0.3 }
+              transition: { duration: 0.3 },
             }}
           >
             <div className="relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-gradient-to-br from-white to-zinc-50/80 p-4 shadow-xl dark:border-zinc-800/50 dark:from-zinc-900/90 dark:to-black/90">
@@ -67,9 +68,9 @@ export function HeroSection() {
             </div>
           </motion.div>
 
-          {/* Gradient Button - Compact */}
+          {/* Ai Voice - sized to match CardFlip */}
           <motion.div
-            className="col-span-2 md:col-span-1"
+            className="col-span-3 md:col-span-1"
             initial={{ rotateY: 15, x: 20 }}
             transition={{
               type: "spring",
@@ -80,12 +81,16 @@ export function HeroSection() {
               rotateY: 0,
               x: 0,
               scale: 1.03,
-              transition: { duration: 0.3 }
+              transition: { duration: 0.3 },
             }}
           >
-            <div className="flex h-full min-h-[180px] flex-col items-center justify-center gap-3 rounded-2xl border border-zinc-200/50 bg-gradient-to-br from-zinc-50 to-white p-6 shadow-xl dark:border-zinc-800/50 dark:from-black/90 dark:to-zinc-900/90">
-              <GradientButton />
-              <AttractButton />
+            <div className="relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-gradient-to-br from-zinc-50 to-white shadow-xl dark:border-zinc-800/50 dark:from-black/90 dark:to-zinc-900/90">
+              <div className="flex w-full items-center justify-center p-4">
+                {/* Match CardFlip footprint: max-w-[280px] & h-[320px] */}
+                <div className="flex h-[320px] w-full max-w-[280px] items-center justify-center">
+                  <AIVoice />
+                </div>
+              </div>
             </div>
           </motion.div>
         </motion.div>
@@ -105,11 +110,11 @@ export function HeroSection() {
           whileHover={{
             scale: 1.02,
             rotateX: 0,
-            transition: { duration: 0.3 }
+            transition: { duration: 0.3 },
           }}
         >
           <div className="relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-gradient-to-br from-white via-zinc-50/50 to-white p-6 shadow-2xl dark:border-zinc-800/50 dark:from-zinc-900/90 dark:via-black/90 dark:to-zinc-900/90">
-            <AI_Prompt />
+            <ActivityCard />
           </div>
         </motion.div>
 
@@ -133,7 +138,7 @@ export function HeroSection() {
               rotateZ: 0,
               y: 0,
               scale: 1.02,
-              transition: { duration: 0.3 }
+              transition: { duration: 0.3 },
             }}
           >
             <div className="relative overflow-hidden rounded-2xl border border-zinc-200/50 bg-gradient-to-br from-white to-zinc-50/80 p-4 shadow-xl dark:border-zinc-800/50 dark:from-zinc-900/90 dark:to-black/90">
@@ -154,7 +159,7 @@ export function HeroSection() {
               rotateZ: 0,
               y: 0,
               scale: 1.02,
-              transition: { duration: 0.3 }
+              transition: { duration: 0.3 },
             }}
           >
             <div className="flex h-full min-h-[200px] flex-col items-center justify-center gap-4 rounded-2xl border border-zinc-200/50 bg-gradient-to-br from-zinc-50 to-white p-4 shadow-xl dark:border-zinc-800/50 dark:from-black/90 dark:to-zinc-900/90">
@@ -178,8 +183,8 @@ export function HeroSection() {
               duration: 2,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: 1
-            }
+              delay: 1,
+            },
           }}
         >
           <div className="rounded-full border border-purple-200 bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-xs font-semibold text-white shadow-lg dark:border-purple-800">
@@ -192,6 +197,4 @@ export function HeroSection() {
 }
 
 export default HeroSection;
-
-
 
