@@ -1,5 +1,3 @@
-
-
 import { componentsList } from "@/lib/components";
 import { notFound } from "next/navigation";
 import fs from "fs";
