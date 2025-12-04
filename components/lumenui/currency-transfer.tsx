@@ -111,7 +111,6 @@ export default function CurrencyTransfer() {
           "w-full max-w-sm mx-auto h-[420px] overflow-hidden",
           "border border-emerald-500/10 dark:border-emerald-500/15",
           "bg-gradient-to-b from-white via-zinc-50 to-zinc-100/90 dark:from-zinc-950 dark:via-zinc-950/95 dark:to-zinc-900",
-          "shadow-[0_18px_45px_rgba(15,23,42,0.42)] dark:shadow-[0_22px_60px_rgba(0,0,0,0.85)]",
           "relative rounded-2xl"
         )}
       >
@@ -178,6 +177,7 @@ export default function CurrencyTransfer() {
                   animate={{ opacity: isCompleted ? 1 : 0.7 }}
                   transition={{ duration: 0.6 }}
                 />
+
                 {/* Inner circle / spinner vs check */}
                 <AnimatePresence mode="wait">
                   {!isCompleted ? (
@@ -275,7 +275,7 @@ export default function CurrencyTransfer() {
 
             {/* Right: From / To blocks */}
             <div className="flex w-[58%] flex-col justify-center gap-3">
-              {/* From */}
+              {/* From — updated to INR + HDFC Bank 2215 */}
               <motion.div
                 className={cn(
                   "w-full rounded-xl border bg-white/80 p-2.5 text-left",
@@ -292,25 +292,25 @@ export default function CurrencyTransfer() {
                     From
                   </span>
                   <span className="rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
-                    USD • Card
+                    INR • HDFC Bank
                   </span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-300 bg-white text-sm font-semibold text-zinc-900 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
-                    $
+                    ₹
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-                      500.00 USD
+                      500.00 INR
                     </span>
                     <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                      Chase Bank •••• 4589
+                      HDFC Bank •••• 2215
                     </span>
                   </div>
                 </div>
               </motion.div>
 
-              {/* To */}
+              {/* To — updated to INR + Axis Bank 8956 */}
               <motion.div
                 className={cn(
                   "w-full rounded-xl border bg-white/80 p-2.5 text-left",
@@ -332,14 +332,14 @@ export default function CurrencyTransfer() {
                 </div>
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-300 bg-white text-sm font-semibold text-zinc-900 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
-                    €
+                    ₹
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-                      460.00 EUR
+                      460.00 INR
                     </span>
                     <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                      Deutsche Bank •••• 7823
+                      Axis Bank •••• 8956
                     </span>
                   </div>
                 </div>
@@ -365,9 +365,9 @@ export default function CurrencyTransfer() {
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    Exchange rate locked at{" "}
+                    Transfer settled at{" "}
                     <span className="font-semibold text-zinc-800 dark:text-zinc-100">
-                      1 USD = 0.92 EUR
+                      1 INR = 1 INR
                     </span>
                   </motion.span>
                 ) : (
@@ -379,14 +379,14 @@ export default function CurrencyTransfer() {
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    Calculating best FX rate...
+                    Processing transfer...
                   </motion.span>
                 )}
               </AnimatePresence>
               <span className="mt-1 text-[10px]">
-                Fee: <span className="line-through opacity-60">$4.90</span>{" "}
+                Fee: <span className="line-through opacity-60">₹4.90</span>{" "}
                 <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                  $0.00
+                  ₹0.00
                 </span>{" "}
                 with Pro
               </span>
@@ -407,7 +407,7 @@ export default function CurrencyTransfer() {
                   <p className="text-[11px]">
                     {isCompleted
                       ? "Funds settled instantly on the recipient bank. Updated just now."
-                      : "Your bank has authorized the payment. We’re finalizing the FX and payout."}
+                      : "Your bank has authorized the payment. We’re finalizing the transfer."}
                   </p>
                 </TooltipContent>
               </Tooltip>

@@ -9,18 +9,19 @@ import FileUpload from "@/components/lumenui/file-upload";
 import AILoadingState from "@/components/lumenui/ai-loading";
 import AIVoice from "@/components/lumenui/ai-voice";
 
+
 export function HeroSection() {
   return (
     <div className="container relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col items-center justify-between gap-8 px-4 py-8 md:py-12 lg:flex-row lg:items-start lg:gap-4">
       {/* Left side - Title and CTA */}
       <div className="flex w-full flex-col items-start space-y-6 text-left lg:mt-16 lg:w-[45%]">
         <div>
-          <h1 className="font-semibold font-montserrat text-5xl text-black leading-[1.1] tracking-tight sm:text-6xl lg:text-6xl dark:text-white">
+          <h1 className="font-semibold font-montserrat text-3xl text-black leading-[1.1] tracking-tight sm:text-6xl lg:text-6xl dark:text-white">
             Build faster with stunning UI components
           </h1>
 
           <p className="mt-6 max-w-lg font-montserrat text-base text-black/90 tracking-tighter md:text-xl dark:text-white/80">
-            A growing collection of 50+ modern UI components built using Tailwind CSS,
+            A growing collection of 30+ modern UI components built using Tailwind CSS,
             shadcn/ui, and Motion refined into the lightweight, accessible LumenUI library.
           </p>
         </div>

@@ -9,7 +9,7 @@ export function Footer() {
                     
                     {/* Left Section - Project Name + Year + Rights */}
                     <div className="text-sm text-zinc-600 dark:text-zinc-400 sm:w-1/3 text-center sm:text-left">
-                        © {new Date().getFullYear()} LumenUI - All rights reserved.
+                        © {new Date().getFullYear()} LumenUI 
                     </div>
 
                     {/* Right Section - X Link */}

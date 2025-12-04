@@ -448,18 +448,7 @@ export const componentsList: Component[] = [
   speed={50}
 />`
   },
-  {
-    name: "Shape Hero",
-    slug: "shape-hero",
-    category: "Layout",
-    install: "npm install framer-motion lucide-react",
-    usage: `import ShapeHero from './shape-hero';
 
-<ShapeHero 
-  title="Build faster"
-  subtitle="The ultimate UI kit"
-/>`
-  },
 
   // Interactive (alphabetically sorted)
   {

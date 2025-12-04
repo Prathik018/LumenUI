@@ -8,240 +8,161 @@ interface LoaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   subtitle?: string;
   size?: "sm" | "md" | "lg";
+  accent?: string;
 }
 
 export default function Loader({
   title = "Configuring your workspace",
-  subtitle = "We’re syncing your settings and preparing your environment",
+  subtitle = "We're syncing your settings and preparing your environment",
   size = "md",
+  accent = "emerald",
   className,
   ...props
 }: LoaderProps) {
-  const sizeConfig = {
-    sm: {
-      circle: 52,
-      stroke: 4,
-      titleClass: "text-sm font-medium",
-      subtitleClass: "text-xs text-muted-foreground",
-      gap: "gap-3",
-      maxWidth: "max-w-52",
-      pillPadding: "px-2.5 py-1",
-      pillText: "text-[10px]",
-    },
-    md: {
-      circle: 72,
-      stroke: 4.5,
-      titleClass: "text-base font-medium",
-      subtitleClass: "text-sm text-muted-foreground",
-      gap: "gap-4",
-      maxWidth: "max-w-64",
-      pillPadding: "px-3 py-1.5",
-      pillText: "text-[11px]",
-    },
-    lg: {
-      circle: 88,
-      stroke: 5,
-      titleClass: "text-lg font-semibold",
-      subtitleClass: "text-sm md:text-base text-muted-foreground",
-      gap: "gap-5",
-      maxWidth: "max-w-72",
-      pillPadding: "px-3.5 py-1.5",
-      pillText: "text-xs",
-    },
+  const sizes = {
+    sm: { box: 64, ring: 48, text: "text-sm", gap: "gap-3" },
+    md: { box: 96, ring: 64, text: "text-base", gap: "gap-4" },
+    lg: { box: 128, ring: 88, text: "text-lg", gap: "gap-5" },
   } as const;
 
-  const cfg = sizeConfig[size];
-  const radius = (cfg.circle - cfg.stroke) / 2;
-  const circumference = 2 * Math.PI * radius;
+  const cfg = sizes[size];
+
+  const accentBg = `from-${accent}-400/60 to-${accent}-600/40`;
+  const accentText = `text-${accent}-600 dark:text-${accent}-400`;
 
   return (
     <div
-      className={cn(
-        "flex flex-col items-center justify-center",
-        "text-black/90 dark:text-white/90",
-        cfg.gap,
-        "p-6",
-        className
-      )}
       role="status"
       aria-live="polite"
+      className={cn(
+        "flex flex-col items-center justify-center",
+        cfg.gap,
+        "p-5 sm:p-6",
+        "bg-gradient-to-b from-white/40 dark:from-black/30 rounded-2xl",
+        className
+      )}
       {...props}
     >
-      {/* 3D loader core */}
-      <motion.div
+      {/* Layered rings + focal mark */}
+      <div
         className="relative flex items-center justify-center"
-        style={{
-          width: cfg.circle,
-          height: cfg.circle,
-          transformStyle: "preserve-3d",
-        }}
-        animate={{
-          rotateX: [18, 14, 18],
-          rotateY: [-22, -18, -22],
-        }}
-        transition={{
-          duration: 3.5,
-          repeat: Number.POSITIVE_INFINITY,
-          ease: [0.4, 0, 0.6, 1],
-        }}
+        style={{ width: cfg.box, height: cfg.box }}
         aria-hidden
       >
-        {/* Soft glow */}
+        {/* Outer soft glow */}
         <motion.div
-          className="absolute inset-0 rounded-full bg-black/5 dark:bg-white/8 blur-xl"
-          animate={{ opacity: [0.12, 0.25, 0.12] }}
-          transition={{
-            duration: 3,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "easeInOut",
-          }}
+          className={cn(
+            "absolute rounded-full blur-3xl opacity-60",
+            `bg-gradient-to-br ${accentBg}`
+          )}
+          style={{ width: cfg.box * 1.6, height: cfg.box * 1.6 }}
+          animate={{ opacity: [0.35, 0.75, 0.35], scale: [1, 1.06, 1] }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Base ring */}
-        <svg
-          width={cfg.circle}
-          height={cfg.circle}
-          viewBox={`0 0 ${cfg.circle} ${cfg.circle}`}
-          className="absolute inset-0"
-        >
-          <circle
-            cx={cfg.circle / 2}
-            cy={cfg.circle / 2}
-            r={radius}
-            fill="none"
-            stroke="currentColor"
-            className="text-black/10 dark:text-white/12"
-            strokeWidth={cfg.stroke}
-          />
-        </svg>
-
-        {/* Animated arc */}
+        {/* Three rotating rings */}
         <motion.svg
-          width={cfg.circle}
-          height={cfg.circle}
-          viewBox={`0 0 ${cfg.circle} ${cfg.circle}`}
-          className="absolute inset-0"
-          animate={{ rotate: 360 }}
-          transition={{
-            duration: 1.4,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "linear",
-          }}
+          width={cfg.box}
+          height={cfg.box}
+          viewBox={`0 0 ${cfg.box} ${cfg.box}`}
+          className="relative"
+          animate={{ rotate: [0, 360] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
         >
-          <circle
-            cx={cfg.circle / 2}
-            cy={cfg.circle / 2}
-            r={radius}
-            fill="none"
-            stroke="currentColor"
-            className="text-black/80 dark:text-white/80"
-            strokeWidth={cfg.stroke}
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={circumference * 0.65}
-          />
+          {[0, 1, 2].map((i) => {
+            const stroke = 2 + i * 1.2;
+            const inset = 6 + i * 6;
+            const dash = (cfg.box - inset * 2) * Math.PI * 0.45;
+
+            return (
+              <circle
+                key={i}
+                cx={cfg.box / 2}
+                cy={cfg.box / 2}
+                r={(cfg.box - inset * 2) / 2}
+                fill="none"
+                stroke="url(#g)"
+                strokeWidth={stroke}
+                strokeLinecap="round"
+                strokeDasharray={dash}
+                strokeDashoffset={i === 1 ? dash * 0.6 : dash * 0.2}
+                opacity={0.95 - i * 0.18}
+              />
+            );
+          })}
+
+          <defs>
+            <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stopColor="#34D399" stopOpacity="0.95" />
+              <stop offset="60%" stopColor="#10B981" stopOpacity="0.95" />
+              <stop offset="100%" stopColor="#059669" stopOpacity="0.95" />
+            </linearGradient>
+          </defs>
         </motion.svg>
 
-        {/* Orbiting node */}
+        {/* Removed Orbiting Nodes Here */}
+      </div>
+
+      {/* Pill + skeleton text */}
+      <div className="flex flex-col items-center text-center">
         <motion.div
-          className="absolute rounded-full bg-black dark:bg-white"
-          style={{
-            width: cfg.stroke * 1.4,
-            height: cfg.stroke * 1.4,
-            top: 0,
-          }}
-          animate={{ rotate: 360 }}
-          transition={{
-            duration: 2.4,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "linear",
-          }}
-        >
-          <div className="w-full h-full rounded-full bg-current shadow-[0_0_10px_rgba(0,0,0,0.25)] dark:shadow-[0_0_12px_rgba(255,255,255,0.35)]" />
-        </motion.div>
-
-        {/* Center core */}
-        <motion.div
-          className="relative rounded-full bg-black dark:bg-white"
-          style={{
-            width: cfg.stroke * 2.6,
-            height: cfg.stroke * 2.6,
-          }}
-          animate={{
-            scale: [1, 1.08, 1],
-            opacity: [0.85, 1, 0.85],
-          }}
-          transition={{
-            duration: 1.6,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "easeInOut",
-          }}
-        >
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/40 to-transparent dark:from-black/20" />
-        </motion.div>
-      </motion.div>
-
-      {/* Status pill */}
-      <motion.div
-        className={cn(
-          "inline-flex items-center justify-center rounded-full border border-black/10 dark:border-white/15",
-          "bg-black/[0.02] dark:bg-white/[0.03] backdrop-blur-sm",
-          "text-[11px] font-mono tracking-[0.12em] uppercase text-black/60 dark:text-white/60",
-          "shadow-[0_0_0_1px_rgba(0,0,0,0.02)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.04)]",
-          cfg.pillPadding
-        )}
-        initial={{ opacity: 0, y: 4 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          delay: 0.2,
-          duration: 0.4,
-          ease: [0.4, 0, 0.2, 1],
-        }}
-      >
-        <motion.span
-          className="mr-1.5 inline-flex rounded-full bg-black/60 dark:bg-white/70"
-          style={{ width: 6, height: 6 }}
-          animate={{ scale: [1, 1.2, 1], opacity: [0.4, 1, 0.4] }}
-          transition={{
-            duration: 1.4,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "easeInOut",
-          }}
-        />
-        <span className="select-none">Preparing</span>
-      </motion.div>
-
-      {/* Text block */}
-      <motion.div
-        className={cn("text-center space-y-1.5", cfg.maxWidth)}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          delay: 0.3,
-          duration: 0.5,
-          ease: [0.4, 0, 0.2, 1],
-        }}
-      >
-        <h2
           className={cn(
-            cfg.titleClass,
-            "tracking-[-0.02em] text-black/90 dark:text-white/90"
+            "inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold",
+            "bg-white/60 dark:bg-zinc-900/70 border border-black/6 dark:border-white/6",
+            accentText
           )}
+          initial={{ y: 8, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.18 }}
+        >
+          <span className="mr-2 w-2 h-2 rounded-full bg-current animate-pulse" />
+          <span className="select-none uppercase tracking-wider text-[11px]">
+            Preparing
+          </span>
+        </motion.div>
+
+        <motion.h3
+          className={cn(
+            cfg.text,
+            "mt-3 font-semibold text-black/90 dark:text-white/90"
+          )}
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.26 }}
         >
           {title}
-        </h2>
-        <p
+        </motion.h3>
+
+        <motion.p
           className={cn(
-            cfg.subtitleClass,
-            "tracking-[-0.01em] text-black/55 dark:text-white/60"
+            "mt-1 text-sm text-zinc-600 dark:text-zinc-400 max-w-[28rem] px-4 sm:px-0"
           )}
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
         >
           {subtitle}
-        </p>
-      </motion.div>
+        </motion.p>
 
-      {/* Screen reader text */}
-      <span className="sr-only">Loading, please wait…</span>
+        <motion.div
+          className="mt-3 flex items-center gap-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.34 }}
+        >
+          <div className="w-36 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800 overflow-hidden">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-white/40 to-white/0 dark:from-black/30"
+              animate={{ x: [-80, 80] }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+            />
+          </div>
+
+          <div className="w-10 h-2 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+        </motion.div>
+      </div>
+
+      <span className="sr-only">Loading {title}</span>
     </div>
   );
 }
