@@ -13,7 +13,7 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "LumenUI",
   description:
-    "A modern component library for building Modern Web Apps developed with Next.js and Shadcn Components",
+    "A modern component library for building Modern Web Apps developed with Next.js, Shadcn Components, Tailwind CSS and Framer Motion.",
 };
 
 export default function RootLayout({

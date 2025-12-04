@@ -10,7 +10,7 @@ export function Header() {
             <div className="relative z-10 mx-auto flex w-full max-w-[1400px] items-center justify-between gap-2">
               <div className="flex items-center gap-6">
                 <Link className="flex items-center gap-2" href="/">
-                  <span className="hidden font-semibold text-lg sm:block">
+                  <span className="block font-semibold text-lg tarcking-wider">
                     LumenUI
                   </span>
                 </Link>
