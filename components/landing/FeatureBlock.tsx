@@ -9,8 +9,8 @@ import ShadcnIcon from "@/components/icons/shadcn";
 
 export default function Features() {
   return (
-    <div className="w-full max-w-none flex justify-start items-center z-10 mx-auto overflow-x-auto no-scrollbar">
-      <div className="flex items-center gap-6 md:gap-8 w-max py-4">
+    <div className="w-full max-w-none flex justify-center items-center z-10 mx-auto overflow-x-auto no-scrollbar">
+      <div className="flex items-center gap-6 md:gap-8 py-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
